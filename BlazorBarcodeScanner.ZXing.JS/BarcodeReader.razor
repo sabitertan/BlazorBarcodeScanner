@@ -1,40 +1,71 @@
 ﻿@using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
 @using BlazorBarcodeScanner.ZXing.JS;
-<section class="container" id="demo-content">
-    <h1 class="title">@Title</h1>
+<section class="zxing-container" id="zxingContent">
+    <h1 class="zxing-title">@Title</h1>
     <div>
-        <a class="button" id="startButton" @onclick="StartDecoding">Start</a>
-        <a class="button" id="resetButton" @onclick="StopDecoding">Reset</a>
+        @if (ShowStart)
+        {
+            <a class="zxing-button" id="zxingStartButton" @onclick="StartDecoding">Start</a>
+        }
+        @if (ShowReset) 
+        {
+            <a class="zxing-button" id="zxingResetButton" @onclick="StopDecoding">Reset</a>
+        }   
     </div>
 
-    <div>
-        <video id="video" width="300" height="200" style="border: 1px solid gray"></video>
+    <div id="zxingVideoContainer">
+        <video id="zxingVideo" width="@VideoWidth" height="@VideoHeigth"></video>
     </div>
-    @if (videoInputDevices == null)
-    {
-        <p>looking for devices</p>
-    }
-    else {
-<div id="sourceSelectPanel">
-    <label for="sourceSelect">Change video source:</label>
-    <select id="sourceSelect" style="max-width:400px">
-        @foreach (var videoInputDevice in videoInputDevices)
+    @if(ShowVideoDeviceList){
+
+
+        @if (videoInputDevices == null)
         {
-            <option value="@videoInputDevice.DeviceId">@videoInputDevice.Label</option>
+            <p>looking for devices</p>
         }
-    </select>
+        else
+        {
+            <div id="sourceSelectPanel">
+                <label for="zxingSourceSelect">Change video source:</label>
+                <select id="zxingSourceSelect" class="zxing-video-input">
+                    @foreach (var videoInputDevice in videoInputDevices)
+                    {
+                        <option value="@videoInputDevice.DeviceId">@videoInputDevice.Label</option>
+                    }
+                </select>
+            </div>
+
+        }
+    }
+
+<div id="zxingResultContainer">
+    <label>Result:</label>
+    <pre><code id="zxingResult">@BarcodeText</code></pre>
 </div>
     
-    }
-    
-
-    <label>Result:</label>
-    <pre><code id="result">@BarcodeText</code></pre>
 </section>
 @code{
     [Parameter]
     public string Title { get; set; } = "Scan Barcode from Camera";
+
+    [Parameter]
+    public bool StartCameraAutomatically { get; set; } = false;
+
+    [Parameter]
+    public bool ShowStart { get; set; } = true;
+
+    [Parameter]
+    public bool ShowReset { get; set; } = true;
+
+    [Parameter]
+    public bool ShowVideoDeviceList { get; set; } = true;
+
+    [Parameter]
+    public int VideoWidth { get; set; } = 300;
+
+    [Parameter]
+    public int VideoHeigth { get; set; } = 200;
 
     public string BarcodeText { get; set; }
 
@@ -49,14 +80,17 @@
 
         videoInputDevices = await JsInteropClass.GetVideoInputDevices(JSRuntime, "get");
     }
-    private void StartDecoding() {
+    private void StartDecoding()
+    {
 
-        JsInteropClass.StartDecoding(JSRuntime, "video");
+        JsInteropClass.StartDecoding(JSRuntime, "zxingVideo");
     }
-    private void StopDecoding() {
+    private void StopDecoding()
+    {
         JsInteropClass.StopDecoding(JSRuntime);
     }
-    private void ReceivedBarcodeText(BarcodeReceivedEventArgs args) {
+    private void ReceivedBarcodeText(BarcodeReceivedEventArgs args)
+    {
         this.BarcodeText = args.BarcodeText;
         StateHasChanged();
     }
