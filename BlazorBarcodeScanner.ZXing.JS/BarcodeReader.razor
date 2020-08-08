@@ -1,0 +1,64 @@
+﻿@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+@using BlazorBarcodeScanner.ZXing.JS;
+<section class="container" id="demo-content">
+    <h1 class="title">@Title</h1>
+    <div>
+        <a class="button" id="startButton" @onclick="StartDecoding">Start</a>
+        <a class="button" id="resetButton" @onclick="StopDecoding">Reset</a>
+    </div>
+
+    <div>
+        <video id="video" width="300" height="200" style="border: 1px solid gray"></video>
+    </div>
+    @if (videoInputDevices == null)
+    {
+        <p>looking for devices</p>
+    }
+    else {
+<div id="sourceSelectPanel">
+    <label for="sourceSelect">Change video source:</label>
+    <select id="sourceSelect" style="max-width:400px">
+        @foreach (var videoInputDevice in videoInputDevices)
+        {
+            <option value="@videoInputDevice.DeviceId">@videoInputDevice.Label</option>
+        }
+    </select>
+</div>
+    
+    }
+    
+
+    <label>Result:</label>
+    <pre><code id="result">@BarcodeText</code></pre>
+</section>
+@code{
+    [Parameter]
+    public string Title { get; set; } = "Scan Barcode from Camera";
+
+    public string BarcodeText { get; set; }
+
+    List<VideoInputDevice> videoInputDevices;
+    protected override async Task OnInitializedAsync()
+    {
+        videoInputDevices = await JsInteropClass.GetVideoInputDevices(JSRuntime, "get");
+        JsInteropClass.BarcodeReceived += ReceivedBarcodeText;
+    }
+    private async Task GetVideoInputDevicesAsync()
+    {
+
+        videoInputDevices = await JsInteropClass.GetVideoInputDevices(JSRuntime, "get");
+    }
+    private void StartDecoding() {
+
+        JsInteropClass.StartDecoding(JSRuntime, "video");
+    }
+    private void StopDecoding() {
+        JsInteropClass.StopDecoding(JSRuntime);
+    }
+    private void ReceivedBarcodeText(BarcodeReceivedEventArgs args) {
+        this.BarcodeText = args.BarcodeText;
+        StateHasChanged();
+    }
+
+}

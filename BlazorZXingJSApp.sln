@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30330.147
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorZXingJSApp.Server", "BlazorZXingJSApp\Server\BlazorZXingJSApp.Server.csproj", "{B1409882-DBF0-4455-9B0F-2F388CF7CB29}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorZXingJSApp.Client", "BlazorZXingJSApp\Client\BlazorZXingJSApp.Client.csproj", "{E4978C04-E804-4866-AA49-2BAC8D51E4C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorZXingJSApp.Shared", "BlazorZXingJSApp\Shared\BlazorZXingJSApp.Shared.csproj", "{28DB66A1-D297-4882-A0C1-842D8FB51356}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorBarcodeScanner.ZXing.JS", "BlazorBarcodeScanner.ZXing.JS\BlazorBarcodeScanner.ZXing.JS.csproj", "{4FD20DAE-AF6B-4230-865E-7E56A6BA8DD9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B1409882-DBF0-4455-9B0F-2F388CF7CB29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1409882-DBF0-4455-9B0F-2F388CF7CB29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1409882-DBF0-4455-9B0F-2F388CF7CB29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1409882-DBF0-4455-9B0F-2F388CF7CB29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4978C04-E804-4866-AA49-2BAC8D51E4C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4978C04-E804-4866-AA49-2BAC8D51E4C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4978C04-E804-4866-AA49-2BAC8D51E4C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4978C04-E804-4866-AA49-2BAC8D51E4C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28DB66A1-D297-4882-A0C1-842D8FB51356}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28DB66A1-D297-4882-A0C1-842D8FB51356}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28DB66A1-D297-4882-A0C1-842D8FB51356}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28DB66A1-D297-4882-A0C1-842D8FB51356}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FD20DAE-AF6B-4230-865E-7E56A6BA8DD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FD20DAE-AF6B-4230-865E-7E56A6BA8DD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FD20DAE-AF6B-4230-865E-7E56A6BA8DD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FD20DAE-AF6B-4230-865E-7E56A6BA8DD9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {393DDFF9-2764-48CB-88F5-7B39DCA36A5A}
+	EndGlobalSection
+EndGlobal
