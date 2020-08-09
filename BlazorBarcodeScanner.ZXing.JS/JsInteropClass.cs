@@ -22,6 +22,9 @@ namespace BlazorBarcodeScanner.ZXing.JS
         {
             jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.stopDecoding");
         }
+        public static void SetVideoInputDevice(IJSRuntime jSRuntime, string deviceId) {
+            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setSelectedDeviceId", deviceId);
+        }
         [JSInvokable]
         public static void ReceiveBarcode(string barcodeText) {
             if (!String.IsNullOrEmpty(barcodeText)) {

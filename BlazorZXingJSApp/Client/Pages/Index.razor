@@ -1,7 +1,26 @@
 ﻿@page "/"
+@using BlazorBarcodeScanner.ZXing.JS
+@inject IJSRuntime JSRuntime
 
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
 <BlazorBarcodeScanner.ZXing.JS.BarcodeReader />
+
+<p>Custom Result : @LocalBarcodeText</p>
 <SurveyPrompt Title="How is Blazor working for you?" />
+
+@code{     
+    private string LocalBarcodeText;
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        JsInteropClass.BarcodeReceived += LocalReceivedBarcodeText; // attach to Barcodereceived event
+    }
+
+    private void LocalReceivedBarcodeText(BarcodeReceivedEventArgs args)
+    {
+        this.LocalBarcodeText = args.BarcodeText;
+        StateHasChanged();
+    }
+}

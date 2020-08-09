@@ -28,7 +28,7 @@
         {
             <div id="sourceSelectPanel">
                 <label for="zxingSourceSelect">Change video source:</label>
-                <select id="zxingSourceSelect" class="zxing-video-input">
+                <select id="zxingSourceSelect" class="zxing-video-input" @onchange="ChangeVideoInputSource">
                     @foreach (var videoInputDevice in videoInputDevices)
                     {
                         <option value="@videoInputDevice.DeviceId">@videoInputDevice.Label</option>
@@ -74,6 +74,9 @@
     {
         videoInputDevices = await JsInteropClass.GetVideoInputDevices(JSRuntime, "get");
         JsInteropClass.BarcodeReceived += ReceivedBarcodeText;
+        if (StartCameraAutomatically) {
+            StartDecoding();
+        }
     }
     private async Task GetVideoInputDevicesAsync()
     {
@@ -93,6 +96,9 @@
     {
         this.BarcodeText = args.BarcodeText;
         StateHasChanged();
+    }
+    private void ChangeVideoInputSource(ChangeEventArgs args) {
+        JsInteropClass.SetVideoInputDevice(JSRuntime, args.Value.ToString());
     }
 
 }
