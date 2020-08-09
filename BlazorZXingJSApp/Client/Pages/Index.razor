@@ -5,9 +5,15 @@
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
-<BlazorBarcodeScanner.ZXing.JS.BarcodeReader />
+<BlazorBarcodeScanner.ZXing.JS.BarcodeReader 
+    StartCameraAutomatically="true"
+    Title="Scanzor"
+    VideoWidth="600"
+    VideoHeigth="450"
+ />
 
 <p>Custom Result : @LocalBarcodeText</p>
+
 <SurveyPrompt Title="How is Blazor working for you?" />
 
 @code{     
