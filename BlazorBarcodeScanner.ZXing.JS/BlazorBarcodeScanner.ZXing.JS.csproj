@@ -3,8 +3,15 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RazorLangVersion>3.0</RazorLangVersion>
-    <Version>0.1.1</Version>
+    <Version>0.1.2</Version>
     <Authors>Sabit Igde</Authors>
+	<Company />
+	<Description>Barcode Scanner component for Blazor using zxing-js Interop</Description>
+	<RepositoryUrl>https://github.com/sabitertan/BlazorBarcodeScanner</RepositoryUrl>
+	<PackageTags>Blazor Barcode QRCode Reader Scanner</PackageTags>
+	<PackageLicenseFile></PackageLicenseFile>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
 

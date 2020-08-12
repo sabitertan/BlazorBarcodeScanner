@@ -21,7 +21,7 @@ Welcome to your new app.
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        JsInteropClass.BarcodeReceived += LocalReceivedBarcodeText; // attach to Barcodereceived event
+        BlazorBarcodeScanner.ZXing.JS.JsInteropClass.BarcodeReceived += LocalReceivedBarcodeText; // attach to Barcodereceived event
     }
 
     private void LocalReceivedBarcodeText(BarcodeReceivedEventArgs args)
