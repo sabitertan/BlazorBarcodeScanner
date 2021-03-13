@@ -4,7 +4,7 @@ Barcode Scanner component for Blazor using [zxing-js](https://github.com/zxing-j
 
 ## Prerequisites
 
-Before you continue, please make sure you have the latest version of Visual Studio and .Net Core installed. Visit official [Blazor](https://dotnet.microsoft.com/apps/aspnet/web-apps/client) site to learn more.
+Before you continue, please make sure you have the latest version of Visual Studio and .NET 5 installed. Visit official [Blazor](https://dotnet.microsoft.com/apps/aspnet/web-apps/client) site to learn more.
 
 ## Installation
 
