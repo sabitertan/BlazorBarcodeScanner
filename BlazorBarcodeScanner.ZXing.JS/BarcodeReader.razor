@@ -8,10 +8,14 @@
         {
             <a class="zxing-button" id="zxingStartButton" @onclick="StartDecoding">Start</a>
         }
-        @if (ShowReset) 
+        @if (ShowReset)
         {
             <a class="zxing-button" id="zxingResetButton" @onclick="StopDecoding">Reset</a>
-        }   
+        }
+        @if (ShowToggleTorch)
+        {
+            <a class="zxing-button" id="zxingTorchButton" @onclick="ToggleTorch">Toggle Torch</a>
+        }
     </div>
 
     <div id="zxingVideoContainer">
@@ -59,6 +63,9 @@
     public bool ShowReset { get; set; } = true;
 
     [Parameter]
+    public bool ShowToggleTorch { get; set; } = true;
+
+    [Parameter]
     public bool ShowVideoDeviceList { get; set; } = true;
 
     [Parameter]
@@ -91,6 +98,10 @@
     private void StopDecoding()
     {
         JsInteropClass.StopDecoding(JSRuntime);
+    }
+    private void ToggleTorch()
+    {
+        JsInteropClass.ToggleTorch(JSRuntime);
     }
     private void ReceivedBarcodeText(BarcodeReceivedEventArgs args)
     {

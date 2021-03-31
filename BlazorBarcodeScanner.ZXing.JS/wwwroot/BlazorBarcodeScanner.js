@@ -92,7 +92,7 @@ window.BlazorBarcodeScanner = {
             .then(message => {
                 console.log(message);
             });
-        console.log('Reset.');
+        console.log('Reset camera stream.');
     },
     setTorchOn: function () {
         if (mediaStreamIsTorchCompatible(this.codeReader.stream)) {
