@@ -17,7 +17,7 @@ function mediaStreamIsTorchCompatible(stream) {
 
     for (const track of tracks) {
         if (mediaStreamIsTorchCompatibleTrack(track)) {
-            return true;// @IDEA returning track to caller might  be helpful ?
+            return true;
         }
     }
 
@@ -25,7 +25,7 @@ function mediaStreamIsTorchCompatible(stream) {
 }
 
 /**
- * Checks if the stream has torch support.
+ * Checks if the stream has torch support and return track has torch capability.
  */
 function mediaStreamGetTorchCompatibleTrack(stream) {
 
