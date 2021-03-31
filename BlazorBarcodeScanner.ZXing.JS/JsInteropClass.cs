@@ -25,6 +25,19 @@ namespace BlazorBarcodeScanner.ZXing.JS
         public static void SetVideoInputDevice(IJSRuntime jSRuntime, string deviceId) {
             jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setSelectedDeviceId", deviceId);
         }
+        public static void SetTorchOn(IJSRuntime jSRuntime)
+        {
+            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setTorchOn");
+        }
+        public static void SetTorchOff(IJSRuntime jSRuntime)
+        {
+            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setTorchOff");
+        }
+        public static void ToggleTorch(IJSRuntime jSRuntime)
+        {
+            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.toggleTorch");
+        }
+
         [JSInvokable]
         public static void ReceiveBarcode(string barcodeText) {
             if (!String.IsNullOrEmpty(barcodeText)) {

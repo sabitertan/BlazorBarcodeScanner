@@ -80,10 +80,10 @@ window.BlazorBarcodeScanner = {
                     });
             }
         });
-        // @TODO: Check if torch or fill light capabilities are available 
-        this.codeReader.stream.getVideoTracks()[0].applyConstraints({
+         
+      /*  this.codeReader.stream.getVideoTracks()[0].applyConstraints({
             advanced: [{ torch: true }] // or false to turn off the torch
-        });
+        }); */
         console.log(`Started continous decode from camera with id ${selectedDeviceId}`);
     },
     stopDecoding: function () {
@@ -108,7 +108,7 @@ window.BlazorBarcodeScanner = {
         let track = mediaStreamGetTorchCompatibleTrack(this.codeReader.stream);
         if (track !== null) {
             let torchStatus = track.getConstraints().torch ? false: true;
-            mediaStreamSetTorch(this.codeReader.stream.getVideoTracks()[0], torchStatus);
+            mediaStreamSetTorch(track, torchStatus);
         }
     }
 };
