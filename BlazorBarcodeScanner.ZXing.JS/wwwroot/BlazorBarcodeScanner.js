@@ -16,12 +16,28 @@ function mediaStreamIsTorchCompatible(stream) {
     const tracks = stream.getVideoTracks();
 
     for (const track of tracks) {
-        if (BrowserCodeReader.mediaStreamIsTorchCompatibleTrack(track)) {
+        if (mediaStreamIsTorchCompatibleTrack(track)) {
             return true;// @IDEA returning track to caller might  be helpful ?
         }
     }
 
     return false;
+}
+
+/**
+ * Checks if the stream has torch support.
+ */
+function mediaStreamGetTorchCompatibleTrack(stream) {
+
+    const tracks = stream.getVideoTracks();
+
+    for (const track of tracks) {
+        if (mediaStreamIsTorchCompatibleTrack(track)) {
+            return track;
+        }
+    }
+
+    return null;
 }
 
   /**
@@ -86,6 +102,13 @@ window.BlazorBarcodeScanner = {
     setTorchOff() {
         if (mediaStreamIsTorchCompatible(this.codeReader.stream)) {
             mediaStreamSetTorch(this.codeReader.stream.getVideoTracks()[0], false);
+        }
+    },
+    toggleTorch() {
+        let track = mediaStreamGetTorchCompatibleTrack(this.codeReader.stream);
+        if (track !== null) {
+            let torchStatus = track.getConstraints().torch ? false: true;
+            mediaStreamSetTorch(this.codeReader.stream.getVideoTracks()[0], torchStatus);
         }
     }
 };
