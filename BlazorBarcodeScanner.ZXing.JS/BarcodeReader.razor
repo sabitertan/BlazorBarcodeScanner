@@ -6,15 +6,15 @@
     <div>
         @if (ShowStart)
         {
-            <a class="zxing-button" id="zxingStartButton" @onclick="StartDecoding">Start</a>
+            <button class="zxing-button" id="zxingStartButton" @onclick="StartDecoding">Start</button>
         }
         @if (ShowReset)
         {
-            <a class="zxing-button" id="zxingResetButton" @onclick="StopDecoding">Reset</a>
+            <button class="zxing-button" id="zxingResetButton" @onclick="StopDecoding">Reset</button>
         }
         @if (ShowToggleTorch)
         {
-            <a class="zxing-button" id="zxingTorchButton" @onclick="ToggleTorch">Toggle Torch</a>
+            <button class="zxing-button" id="zxingTorchButton" @onclick="ToggleTorch">Toggle Torch</button>
         }
     </div>
 
