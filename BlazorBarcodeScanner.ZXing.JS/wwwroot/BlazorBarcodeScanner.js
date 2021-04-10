@@ -59,9 +59,9 @@ function mediaStreamGetTorchCompatibleTrack(stream) {
 window.BlazorBarcodeScanner = {
     codeReader: new ZXing.BrowserMultiFormatReader(),
     listVideoInputDevices: async function () { return await this.codeReader.listVideoInputDevices(); },
-    selecteDeviceId: undefined,
+    selectedDeviceId: undefined,
     setSelectedDeviceId: function (deviceId) {
-        this.selecteDeviceId = deviceId;
+        this.selectedDeviceId = deviceId;
     },
     startDecoding: function (videoElementId) {
         this.codeReader.decodeFromVideoDevice(this.selectedDeviceId, videoElementId, (result, err) => {
