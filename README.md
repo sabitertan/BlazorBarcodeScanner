@@ -25,7 +25,7 @@ dotnet add package BlazorBarcodeScanner.ZXing.JS
 Add following lines to `wwwroot\index.html` (for server side `_Host.cshtml`) before `</body>` tag.
 
 ```html
-    <script src="_content/BlazorBarcodeScanner.ZXing.JS/zxingjs-0.17.1.index.min.js"></script>
+    <script src="_content/BlazorBarcodeScanner.ZXing.JS/zxingjs-0.18.4.index.min.js"></script>
     <script src="_content/BlazorBarcodeScanner.ZXing.JS/BlazorBarcodeScanner.js"></script>
 ```
 
@@ -51,6 +51,7 @@ or with `custom parameters` ( below shows default values of parameters)
     StartCameraAutomatically="false"
     ShowStart="true"
     ShowReset="true"
+    ShowToggleTorch = "true"
     ShowVideoDeviceList="true"
     VideoWidth="300"
     VideoHeigth="200"
@@ -58,6 +59,7 @@ or with `custom parameters` ( below shows default values of parameters)
 
 ```
 
+Note that `ShowToggleTorch` is an experimental feature.
 Library raises a custom event when barcode scanner reads a value from video stream, you can attach to that event using example below in `@code` block.
 
 ```cs
