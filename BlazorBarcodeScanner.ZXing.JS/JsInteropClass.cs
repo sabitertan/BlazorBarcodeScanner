@@ -15,8 +15,8 @@ namespace BlazorBarcodeScanner.ZXing.JS
                 "BlazorBarcodeScanner.listVideoInputDevices",
                 message);
         }
-        public static void StartDecoding(IJSRuntime jSRuntime, string videoElementId) {
-            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.startDecoding", videoElementId);
+        public static void StartDecoding(IJSRuntime jSRuntime, string videoElementId, int width, int height) {
+            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.startDecoding", videoElementId, width, height);
         }
         public static void StopDecoding(IJSRuntime jSRuntime)
         {

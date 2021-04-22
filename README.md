@@ -77,5 +77,15 @@ Library raises a custom event when barcode scanner reads a value from video stre
     }
 ```
 
+### Setting stream quality
+While keeping resolution low speeds up image processing, it might yield poor detection performance due to the limited image quality.
+
+In order to allow the application to trade speed for quality, the stream resolution can be set by the application through the following `custom parameters`:
+  - StreamWidth
+  - StreamHeight
+If set to `null` or `0`, a default (browser dependent?) resolution is applied (e.g. 640px by 480px). If set to any number `>0`, the camera stream is requested with the given setting. The settings are used as `ideal` constraint for `getUserMedia` (see [constraints doc](https://developer.mozilla.org/en-US/docs/Web/API/Media_Streams_API/Constraints#specifying_a_range_of_values). Doing so allows for achieving highest resolution by requesting rediculous high numbers for either dimension, causing  the browser to fall back to the maximum feasable for the device of choice.
+
+**Warning**: While increasing the stream resolution might improve your application's code reading performance, it might greatly affect the over all user experience (e.g. through a drop of the frame rate, increased CPU usage, bad battery life, ...) 
+
 ### Supported Formats
 This library uses auto-detect feature of zxing-js library. It supports variety of barcode types. For more information: [zxing-js supported types](https://github.com/zxing-js/library#supported-formats)
