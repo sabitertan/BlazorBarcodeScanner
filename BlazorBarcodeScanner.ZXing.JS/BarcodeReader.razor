@@ -74,13 +74,19 @@
     [Parameter]
     public int VideoHeigth { get; set; } = 200;
 
+    [Parameter]
+    public int? StreamHeight { get; set; } = null;
+
+    [Parameter]
+    public int? StreamWidth { get; set; } = null;
+
     public string BarcodeText { get; set; }
 
     List<VideoInputDevice> videoInputDevices;
     protected override async Task OnInitializedAsync()
     {
         videoInputDevices = await JsInteropClass.GetVideoInputDevices(JSRuntime, "get");
-        
+
         JsInteropClass.BarcodeReceived += ReceivedBarcodeText;
         if (StartCameraAutomatically && videoInputDevices.Count > 0) {
             JsInteropClass.SetVideoInputDevice(JSRuntime, videoInputDevices[0].DeviceId);
@@ -94,13 +100,14 @@
     }
     private void StartDecoding()
     {
-
-        JsInteropClass.StartDecoding(JSRuntime, "zxingVideo");
+        var width = StreamWidth.HasValue ? StreamWidth.Value : 0;
+        var height = StreamHeight.HasValue ? StreamHeight.Value : 0;
+        JsInteropClass.StartDecoding(JSRuntime, "zxingVideo", width, height);
     }
     private void StopDecoding()
     {
         BarcodeReceivedEventArgs resetBarcodeArgs = new BarcodeReceivedEventArgs();
-         resetBarcodeArgs.BarcodeText = "";
+        resetBarcodeArgs.BarcodeText = "";
         resetBarcodeArgs.TimeReceived = new DateTime();
         ReceivedBarcodeText(resetBarcodeArgs);
         JsInteropClass.StopDecoding(JSRuntime);

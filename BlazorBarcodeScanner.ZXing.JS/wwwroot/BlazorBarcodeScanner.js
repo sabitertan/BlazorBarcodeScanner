@@ -63,8 +63,21 @@ window.BlazorBarcodeScanner = {
     setSelectedDeviceId: function (deviceId) {
         this.selectedDeviceId = deviceId;
     },
-    startDecoding: function (videoElementId) {
-        this.codeReader.decodeFromVideoDevice(this.selectedDeviceId, videoElementId, (result, err) => {
+    startDecoding: function (videoElementId, width, height) {
+        var videoConstraints = {};
+
+        if (!this.selectedDeviceId) {
+            videoConstraints["facingMode"] = 'environment';
+        }
+        else {
+            videoConstraints["deviceId"] = { exact: this.selectedDeviceId };
+        }
+
+        if (width) videoConstraints["width"] = { ideal: width };
+        if (height) videoConstraints["height"] = { ideal: height };
+
+        console.log("Starting decoding with " + videoConstraints);
+        this.codeReader.decodeFromConstraints({ video: videoConstraints }, videoElementId, (result, err) => {
             if (result) {
                 console.log(result);
                 DotNet.invokeMethodAsync('BlazorBarcodeScanner.ZXing.JS', 'ReceiveBarcode', result.text)
