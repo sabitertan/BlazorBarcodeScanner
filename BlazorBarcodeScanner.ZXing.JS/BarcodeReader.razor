@@ -112,6 +112,15 @@
         ReceivedBarcodeText(resetBarcodeArgs);
         JsInteropClass.StopDecoding(JSRuntime);
     }
+
+    public void UpdateResolution()
+    {
+        var width = StreamWidth.HasValue ? StreamWidth.Value : 0;
+        var height = StreamHeight.HasValue ? StreamHeight.Value : 0;
+        StopDecoding();
+        StartDecoding();
+    }
+
     private void ToggleTorch()
     {
         JsInteropClass.ToggleTorch(JSRuntime);

@@ -15,15 +15,26 @@ namespace BlazorBarcodeScanner.ZXing.JS
                 "BlazorBarcodeScanner.listVideoInputDevices",
                 message);
         }
+
         public static void StartDecoding(IJSRuntime jSRuntime, string videoElementId, int width, int height) {
-            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.startDecoding", videoElementId, width, height);
+            SetVideoResolution(jSRuntime, width, height);
+            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.startDecoding", videoElementId);
         }
+
+        public static void StartDecoding(IJSRuntime jSRuntime, string videoElementId) {
+            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.startDecoding", videoElementId);
+        }
+
         public static void StopDecoding(IJSRuntime jSRuntime)
         {
             jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.stopDecoding");
         }
         public static void SetVideoInputDevice(IJSRuntime jSRuntime, string deviceId) {
             jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setSelectedDeviceId", deviceId);
+        }
+        public static void SetVideoResolution(IJSRuntime jSRuntime, int width, int height)
+        {
+            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setVideoResolution", width, height);
         }
         public static void SetTorchOn(IJSRuntime jSRuntime)
         {
