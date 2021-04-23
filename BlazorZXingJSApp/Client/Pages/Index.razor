@@ -4,11 +4,25 @@
 
 <h1>BlazorBarcodeScanner Demo</h1>
 
+<h2>Stream resolution:</h2>
+(stop and start the stream to pickup new resolution)
+<table>
+    <tr>
+        <th>Width:</th><td><input style="width: 7em" @bind="StreamWidth" /></td>
+    </tr>
+    <tr>
+        <th>Height:</th><td><input style="width: 7em" @bind="StreamHeight" /></td>
+    </tr>
+</table>
+<button @onclick="() => _reader.UpdateResolution()">Update stream</button>
+
 <BlazorBarcodeScanner.ZXing.JS.BarcodeReader @ref="_reader"
                                              StartCameraAutomatically="true"
                                              Title="Scanzor"
                                              VideoWidth="600"
-                                             VideoHeigth="450"
+                                             VideoHeigth="480"
+                                             StreamWidth="@StreamWidth"
+                                             StreamHeight="@StreamHeight"
                                              OnBarcodeReceived="LocalReceivedBarcodeText" />
 
 <table>
@@ -36,6 +50,9 @@
 
 @code{
     private BarcodeReader _reader;
+    private int StreamWidth = 640;
+    private int StreamHeight = 480;
+
     private string LocalBarcodeText;
     private int _currentVideoSourceIdx = 0;
 

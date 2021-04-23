@@ -1,6 +1,6 @@
 ﻿@using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
-@using BlazorBarcodeScanner.ZXing.JS;
+
 <section class="zxing-container" id="zxingContent">
     @if (string.IsNullOrWhiteSpace(Title))
     {
@@ -57,7 +57,7 @@
             <pre><code id="zxingResult">@BarcodeText</code></pre>
         </div>
     }
-
+    
 </section>
 @code{
     [Parameter]
@@ -65,9 +65,6 @@
 
     [Parameter]
     public bool StartCameraAutomatically { get; set; } = false;
-
-    [Parameter]
-    public bool ShowControls { get; set; } = true;
 
     [Parameter]
     public bool ShowStart { get; set; } = true;
@@ -105,9 +102,11 @@
 
     public IEnumerable<VideoInputDevice> VideoInputDevices => _videoInputDevices;
 
-    private BarcodeReaderInterop _backend;
 
     public string SelectedVideoInputId { get; private set; } = string.Empty;
+
+
+    private BarcodeReaderInterop _backend;
 
     protected override async Task OnInitializedAsync()
     {
@@ -129,9 +128,17 @@
         _videoInputDevices = await _backend.GetVideoInputDevices("get");
     }
 
+    private void RestartDecoding()
+    {
+        StopDecoding();
+        StartDecoding();
+    }
+
     public void StartDecoding()
     {
-        _backend.StartDecoding("zxingVideo");
+        var width = StreamWidth.HasValue ? StreamWidth.Value : 0;
+        var height = StreamHeight.HasValue ? StreamHeight.Value : 0;
+        _backend.StartDecoding("zxingVideo", width, height);
     }
 
     public void StopDecoding()
@@ -141,6 +148,18 @@
         resetBarcodeArgs.TimeReceived = new DateTime();
         ReceivedBarcodeText(resetBarcodeArgs);
         _backend.StopDecoding();
+    }
+
+    public void UpdateResolution()
+    {
+        var width = StreamWidth.HasValue ? StreamWidth.Value : 0;
+        var height = StreamHeight.HasValue ? StreamHeight.Value : 0;
+        RestartDecoding();
+    }
+
+    public void ToggleTorch()
+    {
+        _backend.ToggleTorch();
     }
 
     public void TorchOn()
@@ -153,22 +172,9 @@
         _backend.SetTorchOff();
     }
 
-    public void ToggleTorch()
-    {
-        _backend.ToggleTorch();
-    }
-
     public void SelectVideoInput(VideoInputDevice device)
     {
-        SelectVideoInput(device.DeviceId);
-    }
-
-    protected void SelectVideoInput(string deviceId)
-    {
-        _backend.SetVideoInputDevice(deviceId);
-        StopDecoding();
-        StartDecoding();
-        SelectedVideoInputId = deviceId;
+        ChangeVideoInputSource(device.DeviceId);
     }
 
     private async void ReceivedBarcodeText(BarcodeReceivedEventArgs args)
@@ -178,8 +184,15 @@
         StateHasChanged();
     }
 
+    protected void ChangeVideoInputSource(string deviceId)
+    {
+        _backend.SetVideoInputDevice(deviceId);
+        RestartDecoding();
+        SelectedVideoInputId = deviceId;
+    }
+
     private void ChangeVideoInputSource(ChangeEventArgs args)
     {
-        SelectVideoInput(args.Value.ToString());
+        ChangeVideoInputSource(args.Value.ToString());
     }
 }

@@ -1,15 +1,12 @@
-﻿using Microsoft.JSInterop;
+using Microsoft.JSInterop;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlazorBarcodeScanner.ZXing.JS
 {
     public class JsInteropClass
     {
-        [Obsolete]
+        [Obsolete("Please use the BarcodeReader control's OnBarcodeReceived Blazor style event callback. This method of registering callbacks is likely to be removed in future releases.")]
         public static event BarcodeReceivedEventHandler BarcodeReceived;
 
         /// <summary>

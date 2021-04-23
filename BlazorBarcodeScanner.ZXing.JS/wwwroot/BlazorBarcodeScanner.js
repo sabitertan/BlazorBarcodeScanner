@@ -63,7 +63,13 @@ window.BlazorBarcodeScanner = {
     setSelectedDeviceId: function (deviceId) {
         this.selectedDeviceId = deviceId;
     },
-    startDecoding: function (videoElementId, width, height) {
+    streamWidth: 640,
+    streamHeight: 480,
+    setVideoResolution: function (width, height) {
+        this.streamWidth = width;
+        this.streamHeight = height;
+    },
+    getVideoConstraints: function () {
         var videoConstraints = {};
 
         if (!this.selectedDeviceId) {
@@ -73,8 +79,13 @@ window.BlazorBarcodeScanner = {
             videoConstraints["deviceId"] = { exact: this.selectedDeviceId };
         }
 
-        if (width) videoConstraints["width"] = { ideal: width };
-        if (height) videoConstraints["height"] = { ideal: height };
+        if (this.streamWidth) videoConstraints["width"] = { ideal: this.streamWidth };
+        if (this.streamHeight) videoConstraints["height"] = { ideal: this.streamHeight };
+
+        return videoConstraints;
+    },
+    startDecoding: function (videoElementId) {
+        var videoConstraints = this.getVideoConstraints();
 
         console.log("Starting decoding with " + videoConstraints);
         this.codeReader.decodeFromConstraints({ video: videoConstraints }, videoElementId, (result, err) => {
