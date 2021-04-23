@@ -98,6 +98,11 @@
 
         videoInputDevices = await JsInteropClass.GetVideoInputDevices(JSRuntime, "get");
     }
+    private void RestartDecoding()
+    {
+        StopDecoding();
+        StartDecoding();
+    }
     private void StartDecoding()
     {
         var width = StreamWidth.HasValue ? StreamWidth.Value : 0;
@@ -117,8 +122,7 @@
     {
         var width = StreamWidth.HasValue ? StreamWidth.Value : 0;
         var height = StreamHeight.HasValue ? StreamHeight.Value : 0;
-        StopDecoding();
-        StartDecoding();
+        RestartDecoding();
     }
 
     private void ToggleTorch()
@@ -132,8 +136,7 @@
     }
     private void ChangeVideoInputSource(ChangeEventArgs args) {
         JsInteropClass.SetVideoInputDevice(JSRuntime, args.Value.ToString());
-        StopDecoding();
-        StartDecoding();
+        RestartDecoding();
     }
 
 }
