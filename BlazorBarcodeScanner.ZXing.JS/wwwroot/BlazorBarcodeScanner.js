@@ -69,6 +69,7 @@ window.BlazorBarcodeScanner = {
         this.streamWidth = width;
         this.streamHeight = height;
     },
+    lastPicture: undefined,
     getVideoConstraints: function () {
         var videoConstraints = {};
 
@@ -84,11 +85,11 @@ window.BlazorBarcodeScanner = {
 
         return videoConstraints;
     },
-    startDecoding: function (videoElementId) {
+    startDecoding: function (video) {
         var videoConstraints = this.getVideoConstraints();
 
         console.log("Starting decoding with " + videoConstraints);
-        this.codeReader.decodeFromConstraints({ video: videoConstraints }, videoElementId, (result, err) => {
+        this.codeReader.decodeFromConstraints({ video: videoConstraints }, video, (result, err) => {
             if (result) {
                 console.log(result);
                 DotNet.invokeMethodAsync('BlazorBarcodeScanner.ZXing.JS', 'ReceiveBarcode', result.text)
@@ -134,5 +135,32 @@ window.BlazorBarcodeScanner = {
             let torchStatus = track.getConstraints().torch ? false: true;
             mediaStreamSetTorch(track, torchStatus);
         }
-    }
+    },
+    capture: async function (type, canvas) {
+        this.lastPicture = "";
+
+        if (!this.codeReader.stream) {
+            return "";
+        }
+
+        var capture = new ImageCapture(this.codeReader.stream.getVideoTracks()[0]);
+
+        await capture.grabFrame()
+            .then(bitmap => {
+                var context = canvas.getContext('2d');
+
+                canvas.width = bitmap.width;
+                canvas.height = bitmap.height;
+
+                context.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height);
+
+                this.lastPicture = canvas.toDataURL(type);
+            });
+    },
+    pictureGetBase64Unmarshalled: function () {
+        return BINDING.js_string_to_mono_string(this.lastPicture);
+    },
+    pictureGetBase64: function () {
+        return this.lastPicture;
+    },
 };

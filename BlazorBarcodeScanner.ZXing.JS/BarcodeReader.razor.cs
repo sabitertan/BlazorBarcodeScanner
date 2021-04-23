@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace BlazorBarcodeScanner.ZXing.JS
@@ -66,7 +65,10 @@ namespace BlazorBarcodeScanner.ZXing.JS
         public string SelectedVideoInputId { get; private set; } = string.Empty;
 
         private List<VideoInputDevice> _videoInputDevices;
+
         private BarcodeReaderInterop _backend;
+        private ElementReference _video;
+        private ElementReference _canvas;
 
         protected override async Task OnInitializedAsync()
         {
@@ -98,7 +100,15 @@ namespace BlazorBarcodeScanner.ZXing.JS
         {
             var width = StreamWidth.HasValue ? StreamWidth.Value : 0;
             var height = StreamHeight.HasValue ? StreamHeight.Value : 0;
-            _backend.StartDecoding("zxingVideo", width, height);
+            _backend.StartDecoding(_video, width, height);
+        }
+
+        public async Task<string> Capture()
+        {
+            var start = DateTime.Now;
+            var image = await _backend.Capture(_canvas);
+            Console.WriteLine($"Captured in {(DateTime.Now - start).TotalMilliseconds} ms");
+            return image;
         }
 
         public void StopDecoding()

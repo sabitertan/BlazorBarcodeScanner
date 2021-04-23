@@ -46,4 +46,10 @@
             <button @onclick="OnVideoSourceNext">Next source</button>
         </td>
     </tr>
+    <tr>
+        <th style="vertical-align: top;"><button @onclick="CapturePicture">Capture</button></th>
+        <td>
+            <img src="@_imgSrc" style="width:100%;height:auto;@(string.IsNullOrWhiteSpace(_imgSrc) ? "display:none;" : "")" />
+        </td>
+    </tr>
 </table>

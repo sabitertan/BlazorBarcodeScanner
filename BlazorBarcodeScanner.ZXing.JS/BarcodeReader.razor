@@ -26,8 +26,9 @@
     }
 
     <div id="zxingVideoContainer">
-        <video id="zxingVideo" width="@VideoWidth" height="@VideoHeight"></video>
+        <video @ref="_video" width="@VideoWidth" height="@VideoHeight"></video>
     </div>
+    <canvas @ref="_canvas" style="display:none;"/>
 
     @if (ShowVideoDeviceList)
     {

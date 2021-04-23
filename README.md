@@ -70,14 +70,37 @@ The library raises a custom event, whenever the barcode scanner sucessfully deco
     ...
     OnCodeReceived="LocalReceivedBarcodeText"
  />
-
 ```
+
 ```cs
     private string LocalBarcodeText;
 
     private void LocalReceivedBarcodeText(BarcodeReceivedEventArgs args)
     {
         this.LocalBarcodeText = args.BarcodeText;
+        StateHasChanged();
+    }
+```
+
+### Capturing a picture from the stream
+In some application it might be useful if a picture can be useful to take a still image of the frame that just decoded the last barcode. Therefor the component features an API call to capture such an image as base64 encoded JPEG image.
+```html
+    <BlazorBarcodeScanner.ZXing.JS.BarcodeReader @ref="_reader"
+        ...
+    />
+    <button @onclick="OnGrabFrame">Grab image</button>
+    <!-- If there is no source URL, we hide the image to avoid he "broken image" icons... -->
+    <img src="@_img"  style="@(string.IsNullOrWhiteSpace(_imgSrc) ? "display:none;" : "")" />
+```
+
+```cs
+    ...
+    private BarcodeReader _reader;
+    private string _img = string.Empty;
+
+    private void OnGrabFrame(MouseEventArgs args)
+    {
+        _imgSrc = await _reader.Capture();
         StateHasChanged();
     }
 ```
