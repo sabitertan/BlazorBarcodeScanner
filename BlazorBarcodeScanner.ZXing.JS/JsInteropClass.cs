@@ -7,57 +7,83 @@ namespace BlazorBarcodeScanner.ZXing.JS
 {
     public class JsInteropClass
     {
-        public static ValueTask<List<VideoInputDevice>> GetVideoInputDevices(IJSRuntime jsRuntime, string message)
+        private IJSRuntime jSRuntime;
+
+        public JsInteropClass(IJSRuntime runtime)
+        {
+            jSRuntime = runtime;
+        }
+
+        public ValueTask<List<VideoInputDevice>> GetVideoInputDevices(string message)
         {
             // Implemented in BlazorBarcodeScannerJsInterop.js
 
-            return jsRuntime.InvokeAsync<List<VideoInputDevice>>(
+            return jSRuntime.InvokeAsync<List<VideoInputDevice>>(
                 "BlazorBarcodeScanner.listVideoInputDevices",
                 message);
         }
-        public static void StartDecoding(IJSRuntime jSRuntime, string videoElementId, int width, int height) {
-            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.startDecoding", videoElementId, width, height);
+
+        public void StartDecoding(string videoElementId, int width, int height)
+        {
+            SetVideoResolution(width, height);
+            StartDecoding(videoElementId);
         }
-        public static void StopDecoding(IJSRuntime jSRuntime)
+
+        public void StartDecoding(string videoElementId)
+        {
+            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.startDecoding", videoElementId);
+        }
+
+        public void StopDecoding()
         {
             jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.stopDecoding");
         }
-        public static void SetVideoInputDevice(IJSRuntime jSRuntime, string deviceId) {
+        public void SetVideoInputDevice(string deviceId)
+        {
             jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setSelectedDeviceId", deviceId);
         }
-        public static void SetTorchOn(IJSRuntime jSRuntime)
+        public void SetVideoResolution(int width, int height)
+        {
+            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setVideoResolution", width, height);
+        }
+        public void SetTorchOn()
         {
             jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setTorchOn");
         }
-        public static void SetTorchOff(IJSRuntime jSRuntime)
+        public void SetTorchOff()
         {
             jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setTorchOff");
         }
-        public static void ToggleTorch(IJSRuntime jSRuntime)
+        public void ToggleTorch()
         {
             jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.toggleTorch");
         }
 
         [JSInvokable]
-        public static void ReceiveBarcode(string barcodeText) {
-            if (!String.IsNullOrEmpty(barcodeText)) {
-                BarcodeReceivedEventArgs args = new BarcodeReceivedEventArgs();
-                args.BarcodeText = barcodeText;
-                args.TimeReceived = DateTime.Now;
+        public static void ReceiveBarcode(string barcodeText)
+        {
+            if (!string.IsNullOrEmpty(barcodeText))
+            {
+                BarcodeReceivedEventArgs args = new BarcodeReceivedEventArgs()
+                {
+                    BarcodeText = barcodeText,
+                    TimeReceived = DateTime.Now,
+                };
                 OnBarcodeReceived(args);
             }
-            
+
         }
-        protected static void OnBarcodeReceived( BarcodeReceivedEventArgs args) {
-            BarcodeReceivedEventHandler handler = BarcodeReceived;
-            BarcodeReceived?.Invoke(args); //same as below
-            // if(handler != null ){
-            //    handler(this, e);
-            // }
+
+        protected static void OnBarcodeReceived(BarcodeReceivedEventArgs args)
+        {
+            BarcodeReceived?.Invoke(args);
         }
+
         public static event BarcodeReceivedEventHandler BarcodeReceived;
     }
-    public class BarcodeReceivedEventArgs : EventArgs { 
+
+    public class BarcodeReceivedEventArgs : EventArgs
+    {
         public string BarcodeText { get; set; }
         public DateTime TimeReceived { get; set; } = new DateTime();
     }

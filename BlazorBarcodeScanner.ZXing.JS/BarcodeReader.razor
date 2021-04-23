@@ -21,7 +21,7 @@
     <div id="zxingVideoContainer">
         <video id="zxingVideo" width="@VideoWidth" height="@VideoHeigth"></video>
     </div>
-    @if(ShowVideoDeviceList){
+    @if (ShowVideoDeviceList) {
 
 
         @if (videoInputDevices == null)
@@ -82,27 +82,32 @@
 
     public string BarcodeText { get; set; }
 
-    List<VideoInputDevice> videoInputDevices;
+    private List<VideoInputDevice> videoInputDevices;
+
+    private BarcodeReaderJsBackend _backend;
+
     protected override async Task OnInitializedAsync()
     {
-        videoInputDevices = await JsInteropClass.GetVideoInputDevices(JSRuntime, "get");
+        await base.OnInitializedAsync();
 
-        JsInteropClass.BarcodeReceived += ReceivedBarcodeText;
-        if (StartCameraAutomatically && videoInputDevices.Count > 0) {
-            JsInteropClass.SetVideoInputDevice(JSRuntime, videoInputDevices[0].DeviceId);
+        _backend = new BarcodeReaderJsBackend(JSRuntime);
+        await GetVideoInputDevicesAsync();
+
+        BarcodeReaderJsBackend.BarcodeReceived += ReceivedBarcodeText;
+        if (StartCameraAutomatically && videoInputDevices.Count > 0)
+        {
+            _backend.SetVideoInputDevice(videoInputDevices[0].DeviceId);
             StartDecoding();
         }
     }
+
     private async Task GetVideoInputDevicesAsync()
     {
-
-        videoInputDevices = await JsInteropClass.GetVideoInputDevices(JSRuntime, "get");
+        videoInputDevices = await _backend.GetVideoInputDevices("get");
     }
     private void StartDecoding()
     {
-        var width = StreamWidth.HasValue ? StreamWidth.Value : 0;
-        var height = StreamHeight.HasValue ? StreamHeight.Value : 0;
-        JsInteropClass.StartDecoding(JSRuntime, "zxingVideo", width, height);
+        _backend.StartDecoding("zxingVideo");
     }
     private void StopDecoding()
     {
@@ -110,21 +115,20 @@
         resetBarcodeArgs.BarcodeText = "";
         resetBarcodeArgs.TimeReceived = new DateTime();
         ReceivedBarcodeText(resetBarcodeArgs);
-        JsInteropClass.StopDecoding(JSRuntime);
+        _backend.StopDecoding();
     }
     private void ToggleTorch()
     {
-        JsInteropClass.ToggleTorch(JSRuntime);
+        _backend.ToggleTorch();
     }
-    private void ReceivedBarcodeText(BarcodeReceivedEventArgs args)
+    private async void ReceivedBarcodeText(BarcodeReceivedEventArgs args)
     {
         this.BarcodeText = args.BarcodeText;
         StateHasChanged();
     }
     private void ChangeVideoInputSource(ChangeEventArgs args) {
-        JsInteropClass.SetVideoInputDevice(JSRuntime, args.Value.ToString());
+        _backend.SetVideoInputDevice(args.Value.ToString());
         StopDecoding();
         StartDecoding();
     }
-
 }
