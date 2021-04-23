@@ -21,9 +21,8 @@
     <div id="zxingVideoContainer">
         <video id="zxingVideo" width="@VideoWidth" height="@VideoHeigth"></video>
     </div>
-    @if (ShowVideoDeviceList) {
-
-
+    @if (ShowVideoDeviceList)
+    {
         @if (videoInputDevices == null)
         {
             <p>looking for devices</p>
@@ -43,11 +42,11 @@
         }
     }
 
-<div id="zxingResultContainer">
-    <label>Result:</label>
-    <pre><code id="zxingResult">@BarcodeText</code></pre>
-</div>
-    
+    <div id="zxingResultContainer">
+        <label>Result:</label>
+        <pre><code id="zxingResult">@BarcodeText</code></pre>
+    </div>
+
 </section>
 @code{
     [Parameter]
@@ -80,20 +79,23 @@
     [Parameter]
     public int? StreamWidth { get; set; } = null;
 
+    [Parameter]
+    public EventCallback<BarcodeReceivedEventArgs> OnBarcodeReceived { get; set; }
+
     public string BarcodeText { get; set; }
 
     private List<VideoInputDevice> videoInputDevices;
 
-    private BarcodeReaderJsBackend _backend;
+    private BarcodeReaderInterop _backend;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
-        _backend = new BarcodeReaderJsBackend(JSRuntime);
+        _backend = new BarcodeReaderInterop(JSRuntime);
         await GetVideoInputDevicesAsync();
 
-        BarcodeReaderJsBackend.BarcodeReceived += ReceivedBarcodeText;
+        BarcodeReaderInterop.BarcodeReceived += ReceivedBarcodeText;
         if (StartCameraAutomatically && videoInputDevices.Count > 0)
         {
             _backend.SetVideoInputDevice(videoInputDevices[0].DeviceId);
@@ -124,9 +126,11 @@
     private async void ReceivedBarcodeText(BarcodeReceivedEventArgs args)
     {
         this.BarcodeText = args.BarcodeText;
+        await OnBarcodeReceived.InvokeAsync(args);
         StateHasChanged();
     }
-    private void ChangeVideoInputSource(ChangeEventArgs args) {
+    private void ChangeVideoInputSource(ChangeEventArgs args)
+    {
         _backend.SetVideoInputDevice(args.Value.ToString());
         StopDecoding();
         StartDecoding();

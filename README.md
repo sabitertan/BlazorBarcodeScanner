@@ -55,20 +55,16 @@ or with `custom parameters` ( below shows default values of parameters)
     ShowVideoDeviceList="true"
     VideoWidth="300"
     VideoHeigth="200"
+    OnCodeReceived="LocalReceivedBarcodeText"
  />
 
 ```
 
 Note that `ShowToggleTorch` is an experimental feature.
-Library raises a custom event when barcode scanner reads a value from video stream, you can attach to that event using example below in `@code` block.
-
+Library raises a custom event, whenever the barcode scanner sucessfully decoded a value from video stream. You can attach to that event using the component's Blazor `EventCallback` named `OnCodeReceived`. 
+Accessing `BlazorBarcodeScanner.ZXing.JS.JsInteropClass.BarcodeReceived` directly is discurraged and will be removed in the future. See the Blazor excerpt in the code block below:
 ```cs
     private string LocalBarcodeText;
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-        BlazorBarcodeScanner.ZXing.JS.JsInteropClass.BarcodeReceived += LocalReceivedBarcodeText; // attach to Barcodereceived event
-    }
 
     private void LocalReceivedBarcodeText(BarcodeReceivedEventArgs args)
     {

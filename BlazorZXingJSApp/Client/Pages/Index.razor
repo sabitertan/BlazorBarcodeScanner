@@ -10,6 +10,7 @@ Welcome to your new app.
     Title="Scanzor"
     VideoWidth="600"
     VideoHeigth="450"
+    OnBarcodeReceived ="LocalReceivedBarcodeText"
  />
 
 <p>Custom Result : @LocalBarcodeText</p>
@@ -18,11 +19,6 @@ Welcome to your new app.
 
 @code{     
     private string LocalBarcodeText;
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-        BlazorBarcodeScanner.ZXing.JS.JsInteropClass.BarcodeReceived += LocalReceivedBarcodeText; // attach to Barcodereceived event
-    }
 
     private void LocalReceivedBarcodeText(BarcodeReceivedEventArgs args)
     {
