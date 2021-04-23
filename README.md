@@ -54,8 +54,7 @@ or with `custom parameters` ( below shows default values of parameters)
     ShowToggleTorch = "true"
     ShowVideoDeviceList="true"
     VideoWidth="300"
-    VideoHeigth="200"
-    OnCodeReceived="LocalReceivedBarcodeText"
+    VideoHeight="200"
  />
 
 ```
@@ -65,7 +64,14 @@ Note that `ShowToggleTorch` is an experimental feature.
 ### Receiving callbacks
 The library raises a custom event, whenever the barcode scanner sucessfully decoded a value from video stream. You can attach to that event using the component's Blazor `EventCallback` named `OnCodeReceived`.
 
-**Note**: Accessing `BlazorBarcodeScanner.ZXing.JS.JsInteropClass.BarcodeReceived` directly is discouraged and will be removed in the future. See the Blazor excerpt in the code block below:
+**Note**: Accessing `BlazorBarcodeScanner.ZXing.JS.JsInteropClass.BarcodeReceived` directly is discuraged and will be removed in the future. See the corresponding fragments in the code blocks below:
+```html
+<BlazorBarcodeScanner.ZXing.JS.BarcodeReader 
+    ...
+    OnCodeReceived="LocalReceivedBarcodeText"
+ />
+
+```
 ```cs
     private string LocalBarcodeText;
 
@@ -82,6 +88,7 @@ While keeping resolution low speeds up image processing, it might yield poor det
 In order to allow the application to trade speed for quality, the stream resolution can be set by the application through the following `custom parameters`:
   - StreamWidth
   - StreamHeight
+
 If set to `null` or `0`, a default (browser dependent?) resolution is applied (e.g. 640px by 480px). If set to any number `>0`, the camera stream is requested with the given setting. The settings are used as `ideal` constraint for `getUserMedia` (see [constraints doc](https://developer.mozilla.org/en-US/docs/Web/API/Media_Streams_API/Constraints#specifying_a_range_of_values). Doing so allows for achieving highest resolution by requesting rediculous high numbers for either dimension, causing  the browser to fall back to the maximum feasable for the device of choice.
 
 **Warning**: While increasing the stream resolution might improve your application's code reading performance, it might greatly affect the over all user experience (e.g. through a drop of the frame rate, increased CPU usage, bad battery life, ...) 
