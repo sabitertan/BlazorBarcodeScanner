@@ -2,27 +2,90 @@
 @using BlazorBarcodeScanner.ZXing.JS
 @inject IJSRuntime JSRuntime
 
-<h1>Hello, world!</h1>
+<h1>BlazorBarcodeScanner Demo</h1>
 
-Welcome to your new app.
-<BlazorBarcodeScanner.ZXing.JS.BarcodeReader 
-    StartCameraAutomatically="true"
-    Title="Scanzor"
-    VideoWidth="600"
-    VideoHeigth="450"
-    OnBarcodeReceived ="LocalReceivedBarcodeText"
- />
+<BlazorBarcodeScanner.ZXing.JS.BarcodeReader @ref="_reader"
+                                             StartCameraAutomatically="true"
+                                             Title="Scanzor"
+                                             VideoWidth="600"
+                                             VideoHeigth="450"
+                                             OnBarcodeReceived="LocalReceivedBarcodeText" />
 
-<p>Custom Result : @LocalBarcodeText</p>
+<table>
+    <tr>
+        <th>Custom Result:</th>
+        <td>@LocalBarcodeText</td>
+    </tr>
+    <tr>
+        <th>Custom Controls:</th>
+        <td>
+            <button @onclick="() => _reader.StartDecoding()">Start</button>
+            <button @onclick="() => _reader.StopDecoding()">Stop</button>
+            <button @onclick="() => _reader.ToggleTorch()">Toggle Torch</button>
+            <button @onclick="() => _reader.TorchOn()">Toggle On</button>
+            <button @onclick="() => _reader.TorchOff()">Toggle Off</button>
+        </td>
+    </tr>
+    <tr>
+        <th>Custom Source Switch</th>
+        <td>
+            <button @onclick="OnVideoSourceNext">Next source</button>
+        </td>
+    </tr>
+</table>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
-
-@code{     
+@code{
+    private BarcodeReader _reader;
     private string LocalBarcodeText;
+    private int _currentVideoSourceIdx = 0;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+        if (firstRender)
+        {
+            if (!string.IsNullOrWhiteSpace(_reader.SelectedVideoInputId))
+            {
+                _currentVideoSourceIdx = SourceIndexFromId();
+            }
+        }
+    }
+
+    private int SourceIndexFromId()
+    {
+        int result = 0;
+        var inputs = _reader.VideoInputDevices.ToList();
+        for (result = 0; result < inputs.Count; result++)
+        {
+            if (inputs[result].DeviceId.Equals(_reader.SelectedVideoInputId))
+            {
+                break;
+            }
+        }
+        return result;
+    }
 
     private void LocalReceivedBarcodeText(BarcodeReceivedEventArgs args)
     {
         this.LocalBarcodeText = args.BarcodeText;
         StateHasChanged();
+    }
+
+    private void OnVideoSourceNext(MouseEventArgs args)
+    {
+        var inputs = _reader.VideoInputDevices.ToList();
+
+        if (inputs.Count == 0) {
+            return;
+        }
+
+        _currentVideoSourceIdx++;
+        if (_currentVideoSourceIdx >= inputs.Count)
+        {
+            _currentVideoSourceIdx = 0;
+        }
+
+        _reader.SelectVideoInput(inputs[_currentVideoSourceIdx]);
     }
 }
