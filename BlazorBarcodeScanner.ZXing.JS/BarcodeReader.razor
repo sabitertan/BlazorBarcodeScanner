@@ -26,7 +26,7 @@
     }
 
     <div id="zxingVideoContainer">
-        <video id="zxingVideo" width="@VideoWidth" height="@VideoHeigth"></video>
+        <video id="zxingVideo" width="@VideoWidth" height="@VideoHeight"></video>
     </div>
 
     @if (ShowVideoDeviceList)
@@ -60,41 +60,52 @@
     
 </section>
 @code{
-    [Parameter]
-    public string Title { get; set; } = "Scan Barcode from Camera";
+        [Parameter]
+        public string Title { get; set; } = "Scan Barcode from Camera";
 
-    [Parameter]
-    public bool StartCameraAutomatically { get; set; } = false;
+        [Parameter]
+        public bool StartCameraAutomatically { get; set; } = false;
 
-    [Parameter]
-    public bool ShowStart { get; set; } = true;
+        [Parameter]
+        public bool ShowStart { get; set; } = true;
 
-    [Parameter]
-    public bool ShowReset { get; set; } = true;
+        [Parameter]
+        public bool ShowReset { get; set; } = true;
 
-    [Parameter]
-    public bool ShowToggleTorch { get; set; } = true;
+        [Parameter]
+        public bool ShowToggleTorch { get; set; } = true;
 
-    [Parameter]
-    public bool ShowResult { get; set; } = true;
+        [Parameter]
+        public bool ShowResult { get; set; } = true;
 
-    [Parameter]
-    public bool ShowVideoDeviceList { get; set; } = true;
+        [Parameter]
+        public bool ShowVideoDeviceList { get; set; } = true;
 
-    [Parameter]
-    public int VideoWidth { get; set; } = 300;
+        [Parameter]
+        public int VideoWidth { get; set; } = 300;
 
-    [Parameter]
-    public int VideoHeigth { get; set; } = 200;
+        [Parameter]
+        public int VideoHeight { get; set; } = 200;
 
-    [Parameter]
-    public int? StreamHeight { get; set; } = null;
+        [Parameter]
+        [Obsolete("This parameter is misspelled and rerouted to `VideoHeight`. Please change your reference as the misspelled property is likely to be removed in future releases.")]
+        public int VideoHeigth { get
+            {
+                return VideoHeight;
+            }
+            set{
+                VideoHeight = value;
+            }
+        }
 
-    [Parameter]
-    public int? StreamWidth { get; set; } = null;
+        [Parameter]
+        public int? StreamHeight { get; set; } = null;
 
-    [Parameter]
-    public EventCallback<BarcodeReceivedEventArgs> OnBarcodeReceived { get; set; }
+        [Parameter]
+        public int? StreamWidth { get; set; } = null;
+
+        [Parameter]
+        public EventCallback<BarcodeReceivedEventArgs> OnBarcodeReceived { get; set; }
 
     public string BarcodeText { get; set; }
 
