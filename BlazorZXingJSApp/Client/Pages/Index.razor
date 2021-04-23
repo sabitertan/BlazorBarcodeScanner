@@ -5,18 +5,36 @@
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
-<BlazorBarcodeScanner.ZXing.JS.BarcodeReader 
-    StartCameraAutomatically="true"
-    Title="Scanzor"
-    VideoWidth="600"
-    VideoHeigth="450"
- />
+
+<h2>Stream resolution:</h2>
+(stop and start the stream to pickup new resolution)
+<table>
+    <tr>
+        <th>Width:</th><td><input style="width: 7em" @bind="StreamWidth" /></td>
+    </tr>
+    <tr>
+        <th>Height:</th><td><input style="width: 7em" @bind="StreamHeight" /></td>
+    </tr>
+</table>
+<button @onclick="() => _scanner.UpdateResolution()">Update stream</button>
+
+<BlazorBarcodeScanner.ZXing.JS.BarcodeReader @ref="_scanner"
+                                             StartCameraAutomatically="true"
+                                             Title="Scanzor"
+                                             VideoWidth="600"
+                                             VideoHeigth="450"
+                                             StreamWidth="@StreamWidth"
+                                             StreamHeight="@StreamHeight" />
 
 <p>Custom Result : @LocalBarcodeText</p>
 
 <SurveyPrompt Title="How is Blazor working for you?" />
 
-@code{     
+@code{ 
+    private BarcodeReader _scanner;
+    private int StreamWidth = 640;
+    private int StreamHeight = 480;
+
     private string LocalBarcodeText;
     protected override async Task OnInitializedAsync()
     {
