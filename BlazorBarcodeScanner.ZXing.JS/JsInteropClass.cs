@@ -1,73 +1,31 @@
 using Microsoft.JSInterop;
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Linq;
 
 namespace BlazorBarcodeScanner.ZXing.JS
 {
     public class JsInteropClass
     {
-        public static ValueTask<List<VideoInputDevice>> GetVideoInputDevices(IJSRuntime jsRuntime, string message)
-        {
-            // Implemented in BlazorBarcodeScannerJsInterop.js
+        [Obsolete("Please use the BarcodeReader control's OnBarcodeReceived Blazor style event callback. This method of registering callbacks is likely to be removed in future releases.")]
+        public static event BarcodeReceivedEventHandler BarcodeReceived;
 
-            return jsRuntime.InvokeAsync<List<VideoInputDevice>>(
-                "BlazorBarcodeScanner.listVideoInputDevices",
-                message);
-        }
-        public static void StartDecoding(IJSRuntime jSRuntime, string videoElementId, int width, int height) {
-            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.startDecoding", videoElementId, width, height);
-        }
-        public static void StopDecoding(IJSRuntime jSRuntime)
+        /// <summary>
+        /// Invoked through the new, internal interop class (<see cref="BarcodeReaderInterop"/>). 
+        /// Will be removed as soon as <see cref="BarcodeReceived"/> is removed.
+        /// </summary>
+        /// <param name="args"></param>
+        internal static void OnBarcodeReceived(BarcodeReceivedEventArgs args)
         {
-            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.stopDecoding");
-        }
-        public static void SetVideoInputDevice(IJSRuntime jSRuntime, string deviceId) {
-            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setSelectedDeviceId", deviceId);
-        }
-        public static void SetTorchOn(IJSRuntime jSRuntime)
-        {
-            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setTorchOn");
-        }
-        public static void SetTorchOff(IJSRuntime jSRuntime)
-        {
-            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setTorchOff");
-        }
-        public static void ToggleTorch(IJSRuntime jSRuntime)
-        {
-            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.toggleTorch");
+            BarcodeReceived?.Invoke(args);
         }
 
         [JSInvokable]
-        public static void ReceiveBarcode(string barcodeText) {
-            if (!String.IsNullOrEmpty(barcodeText)) {
-                BarcodeReceivedEventArgs args = new BarcodeReceivedEventArgs();
-                args.BarcodeText = barcodeText;
-                args.TimeReceived = DateTime.Now;
-                OnBarcodeReceived(args);
-            }
-            
+        public static void ReceiveBarcode(string barcodeText)
+        {
+            /* Unfortunately JS is unable to invoke public methods of internal classes. Thus
+             * we route the call to the internal class at this point. This allows us to hide away
+             * the rest of the interop from the component's client. */
+            BarcodeReaderInterop.OnBarcodeReceived(barcodeText);
         }
-        protected static void OnBarcodeReceived( BarcodeReceivedEventArgs args) {
-            BarcodeReceivedEventHandler handler = BarcodeReceived;
-            BarcodeReceived?.Invoke(args); //same as below
-            // if(handler != null ){
-            //    handler(this, e);
-            // }
-        }
-        public static event BarcodeReceivedEventHandler BarcodeReceived;
-    }
-    public class BarcodeReceivedEventArgs : EventArgs { 
-        public string BarcodeText { get; set; }
-        public DateTime TimeReceived { get; set; } = new DateTime();
-    }
-    public delegate void BarcodeReceivedEventHandler(BarcodeReceivedEventArgs args);
-    public class VideoInputDevice
-    {
-        public string DeviceId { get; set; }
-        public string GroupId { get; set; }
-        public string Kind { get; set; }
-        public string Label { get; set; }
-
     }
 }

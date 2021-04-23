@@ -1,30 +1,37 @@
 ﻿@using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
-@using BlazorBarcodeScanner.ZXing.JS;
+
 <section class="zxing-container" id="zxingContent">
-    <h1 class="zxing-title">@Title</h1>
-    <div>
-        @if (ShowStart)
-        {
-            <button class="zxing-button" id="zxingStartButton" @onclick="StartDecoding">Start</button>
-        }
-        @if (ShowReset)
-        {
-            <button class="zxing-button" id="zxingResetButton" @onclick="StopDecoding">Reset</button>
-        }
-        @if (ShowToggleTorch)
-        {
-            <button class="zxing-button" id="zxingTorchButton" @onclick="ToggleTorch">Toggle Torch</button>
-        }
-    </div>
+    @if (string.IsNullOrWhiteSpace(Title))
+    {
+        <h1 class="zxing-title">@Title</h1>
+    }
+
+    @if (ShowStart || ShowReset || ShowToggleTorch)
+    {
+        <div>
+            @if (ShowStart)
+            {
+                <button class="zxing-button" id="zxingStartButton" @onclick="StartDecoding">Start</button>
+            }
+            @if (ShowReset)
+            {
+                <button class="zxing-button" id="zxingResetButton" @onclick="StopDecoding">Reset</button>
+            }
+            @if (ShowToggleTorch)
+            {
+                <button class="zxing-button" id="zxingTorchButton" @onclick="ToggleTorch">Toggle Torch</button>
+            }
+        </div>
+    }
 
     <div id="zxingVideoContainer">
-        <video id="zxingVideo" width="@VideoWidth" height="@VideoHeigth"></video>
+        <video id="zxingVideo" width="@VideoWidth" height="@VideoHeight"></video>
     </div>
-    @if(ShowVideoDeviceList){
 
-
-        @if (videoInputDevices == null)
+    @if (ShowVideoDeviceList)
+    {
+        @if (_videoInputDevices == null)
         {
             <p>looking for devices</p>
         }
@@ -33,7 +40,7 @@
             <div id="sourceSelectPanel">
                 <label for="zxingSourceSelect">Change video source:</label>
                 <select id="zxingSourceSelect" class="zxing-video-input" @onchange="ChangeVideoInputSource">
-                    @foreach (var videoInputDevice in videoInputDevices)
+                    @foreach (var videoInputDevice in _videoInputDevices)
                     {
                         <option value="@videoInputDevice.DeviceId">@videoInputDevice.Label</option>
                     }
@@ -43,88 +50,12 @@
         }
     }
 
-<div id="zxingResultContainer">
-    <label>Result:</label>
-    <pre><code id="zxingResult">@BarcodeText</code></pre>
-</div>
+    @if (ShowResult)
+    {
+        <div id="zxingResultContainer">
+            <label>Result:</label>
+            <pre><code id="zxingResult">@BarcodeText</code></pre>
+        </div>
+    }
     
 </section>
-@code{
-    [Parameter]
-    public string Title { get; set; } = "Scan Barcode from Camera";
-
-    [Parameter]
-    public bool StartCameraAutomatically { get; set; } = false;
-
-    [Parameter]
-    public bool ShowStart { get; set; } = true;
-
-    [Parameter]
-    public bool ShowReset { get; set; } = true;
-
-    [Parameter]
-    public bool ShowToggleTorch { get; set; } = true;
-
-    [Parameter]
-    public bool ShowVideoDeviceList { get; set; } = true;
-
-    [Parameter]
-    public int VideoWidth { get; set; } = 300;
-
-    [Parameter]
-    public int VideoHeigth { get; set; } = 200;
-
-    [Parameter]
-    public int? StreamHeight { get; set; } = null;
-
-    [Parameter]
-    public int? StreamWidth { get; set; } = null;
-
-    public string BarcodeText { get; set; }
-
-    List<VideoInputDevice> videoInputDevices;
-    protected override async Task OnInitializedAsync()
-    {
-        videoInputDevices = await JsInteropClass.GetVideoInputDevices(JSRuntime, "get");
-
-        JsInteropClass.BarcodeReceived += ReceivedBarcodeText;
-        if (StartCameraAutomatically && videoInputDevices.Count > 0) {
-            JsInteropClass.SetVideoInputDevice(JSRuntime, videoInputDevices[0].DeviceId);
-            StartDecoding();
-        }
-    }
-    private async Task GetVideoInputDevicesAsync()
-    {
-
-        videoInputDevices = await JsInteropClass.GetVideoInputDevices(JSRuntime, "get");
-    }
-    private void StartDecoding()
-    {
-        var width = StreamWidth.HasValue ? StreamWidth.Value : 0;
-        var height = StreamHeight.HasValue ? StreamHeight.Value : 0;
-        JsInteropClass.StartDecoding(JSRuntime, "zxingVideo", width, height);
-    }
-    private void StopDecoding()
-    {
-        BarcodeReceivedEventArgs resetBarcodeArgs = new BarcodeReceivedEventArgs();
-        resetBarcodeArgs.BarcodeText = "";
-        resetBarcodeArgs.TimeReceived = new DateTime();
-        ReceivedBarcodeText(resetBarcodeArgs);
-        JsInteropClass.StopDecoding(JSRuntime);
-    }
-    private void ToggleTorch()
-    {
-        JsInteropClass.ToggleTorch(JSRuntime);
-    }
-    private void ReceivedBarcodeText(BarcodeReceivedEventArgs args)
-    {
-        this.BarcodeText = args.BarcodeText;
-        StateHasChanged();
-    }
-    private void ChangeVideoInputSource(ChangeEventArgs args) {
-        JsInteropClass.SetVideoInputDevice(JSRuntime, args.Value.ToString());
-        StopDecoding();
-        StartDecoding();
-    }
-
-}
