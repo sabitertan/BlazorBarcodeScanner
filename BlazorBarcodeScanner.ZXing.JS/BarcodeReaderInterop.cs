@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace BlazorBarcodeScanner.ZXing.JS
 {
-    public class BarcodeReaderInterop
+    internal class BarcodeReaderInterop
     {
         private IJSRuntime jSRuntime;
 
@@ -38,44 +38,46 @@ namespace BlazorBarcodeScanner.ZXing.JS
         {
             jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.stopDecoding");
         }
+
         public void SetVideoInputDevice(string deviceId)
         {
             jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setSelectedDeviceId", deviceId);
         }
+
         public void SetVideoResolution(int width, int height)
         {
             jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setVideoResolution", width, height);
         }
+
         public void SetTorchOn()
         {
             jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setTorchOn");
         }
+
         public void SetTorchOff()
         {
             jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setTorchOff");
         }
+
         public void ToggleTorch()
         {
             jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.toggleTorch");
         }
 
-        [JSInvokable]
-        public static void ReceiveBarcode(string barcodeText)
+        public static void OnBarcodeReceived(string barcodeText)
         {
-            if (!string.IsNullOrEmpty(barcodeText))
+            if (string.IsNullOrEmpty(barcodeText))
             {
-                BarcodeReceivedEventArgs args = new BarcodeReceivedEventArgs()
-                {
-                    BarcodeText = barcodeText,
-                    TimeReceived = DateTime.Now,
-                };
-                OnBarcodeReceived(args);
+                return;
             }
 
-        }
+            BarcodeReceivedEventArgs args = new BarcodeReceivedEventArgs()
+            {
+                BarcodeText = barcodeText,
+                TimeReceived = DateTime.Now,
+            };
 
-        protected static void OnBarcodeReceived(BarcodeReceivedEventArgs args)
-        {
+            JsInteropClass.OnBarcodeReceived(args);
             BarcodeReceived?.Invoke(args);
         }
 
@@ -87,7 +89,9 @@ namespace BlazorBarcodeScanner.ZXing.JS
         public string BarcodeText { get; set; }
         public DateTime TimeReceived { get; set; } = new DateTime();
     }
+
     public delegate void BarcodeReceivedEventHandler(BarcodeReceivedEventArgs args);
+
     public class VideoInputDevice
     {
         public string DeviceId { get; set; }
