@@ -1,6 +1,6 @@
 ﻿@using Microsoft.JSInterop
 
-<section class="zxing-container" id="zxingContent">
+<section class="zxing-container">
     @if (string.IsNullOrWhiteSpace(Title))
     {
         <h1 class="zxing-title">@Title</h1>
@@ -11,20 +11,20 @@
         <div>
             @if (ShowStart)
             {
-                <button class="zxing-button" id="zxingStartButton" @onclick="StartDecoding">Start</button>
+                <button class="zxing-button start" @onclick="StartDecoding">Start</button>
             }
             @if (ShowReset)
             {
-                <button class="zxing-button" id="zxingResetButton" @onclick="StopDecoding">Reset</button>
+                <button class="zxing-button stop" @onclick="StopDecoding">Stop</button>
             }
             @if (ShowToggleTorch)
             {
-                <button class="zxing-button" id="zxingTorchButton" @onclick="ToggleTorch">Toggle Torch</button>
+                <button class="zxing-button torch" @onclick="ToggleTorch">Toggle Torch</button>
             }
         </div>
     }
 
-    <div id="zxingVideoContainer">
+    <div class="zxing-video-container">
         <video @ref="_video" width="@VideoWidth" height="@VideoHeight"></video>
     </div>
     <canvas @ref="_canvas" style="display:none;"/>
@@ -37,14 +37,16 @@
         }
         else
         {
-            <div id="sourceSelectPanel">
-                <label for="zxingSourceSelect">Change video source:</label>
-                <select id="zxingSourceSelect" class="zxing-video-input" @onchange="OnVideoInputSourceChanged">
-                    @foreach (var videoInputDevice in _videoInputDevices)
-                    {
-                        <option value="@videoInputDevice.DeviceId">@videoInputDevice.Label</option>
-                    }
-                </select>
+            <div class="zxing-source-select-container">
+                <label>
+                    Change video source:
+                    <select class="zxing-video-select" @onchange="OnVideoInputSourceChanged">
+                        @foreach (var videoInputDevice in _videoInputDevices)
+                        {
+                            <option value="@videoInputDevice.DeviceId">@videoInputDevice.Label</option>
+                        }
+                    </select>
+                </label>
             </div>
 
         }
@@ -52,9 +54,9 @@
 
     @if (ShowResult)
     {
-        <div id="zxingResultContainer">
+        <div class="zxing-result-container">
             <label>Result:</label>
-            <pre><code id="zxingResult">@BarcodeText</code></pre>
+            <pre><code class="zxing-result">@BarcodeText</code></pre>
         </div>
     }
     
