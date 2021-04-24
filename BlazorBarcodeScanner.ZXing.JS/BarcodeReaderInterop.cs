@@ -115,14 +115,19 @@ namespace BlazorBarcodeScanner.ZXing.JS
             return jS.InvokeUnmarshalled<string>("BlazorBarcodeScanner.pictureGetBase64Unmarshalled");
         }
 #endif 
-
+        private static string lastCode = string.Empty;
         public static void OnBarcodeReceived(string barcodeText)
         {
             if (string.IsNullOrEmpty(barcodeText))
             {
                 return;
             }
-
+            /* Debounce code */
+            if (barcodeText == lastCode)
+            {
+                return;
+            }
+            lastCode = barcodeText;
             BarcodeReceivedEventArgs args = new BarcodeReceivedEventArgs()
             {
                 BarcodeText = barcodeText,
