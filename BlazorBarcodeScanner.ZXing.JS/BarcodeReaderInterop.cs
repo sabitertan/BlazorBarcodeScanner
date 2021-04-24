@@ -64,14 +64,17 @@ namespace BlazorBarcodeScanner.ZXing.JS
             jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.toggleTorch");
         }
 
+        private static string lastCode = string.Empty;
         public static void OnBarcodeReceived(string barcodeText)
         {
-            if (string.IsNullOrEmpty(barcodeText))
+            /* Debounce code */
+            if (barcodeText == lastCode)
             {
                 return;
             }
 
-            BarcodeReceivedEventArgs args = new BarcodeReceivedEventArgs()
+            lastCode = barcodeText;
+            var args = new BarcodeReceivedEventArgs()
             {
                 BarcodeText = barcodeText,
                 TimeReceived = DateTime.Now,
