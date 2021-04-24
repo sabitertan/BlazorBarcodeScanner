@@ -8,7 +8,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
 {
     internal class BarcodeReaderInterop
     {
-        private IJSRuntime jSRuntime;
+        private readonly IJSRuntime jSRuntime;
 
         public BarcodeReaderInterop(IJSRuntime runtime)
         {
@@ -30,39 +30,39 @@ namespace BlazorBarcodeScanner.ZXing.JS
             StartDecoding(video);
         }
 
-        public void StartDecoding(ElementReference video)
+        public async void StartDecoding(ElementReference video)
         {
-            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.startDecoding", video);
+            await jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.startDecoding", video);
         }
 
-        public void StopDecoding()
+        public async void StopDecoding()
         {
-            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.stopDecoding");
+            await  jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.stopDecoding");
         }
 
-        public void SetVideoInputDevice(string deviceId)
+        public async void SetVideoInputDevice(string deviceId)
         {
-            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setSelectedDeviceId", deviceId);
+            await  jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setSelectedDeviceId", deviceId);
         }
 
-        public void SetVideoResolution(int width, int height)
+        public async void SetVideoResolution(int width, int height)
         {
-            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setVideoResolution", width, height);
+            await  jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setVideoResolution", width, height);
         }
 
-        public void SetTorchOn()
+        public async void SetTorchOn()
         {
-            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setTorchOn");
+            await  jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setTorchOn");
         }
 
-        public void SetTorchOff()
+        public async void SetTorchOff()
         {
-            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setTorchOff");
+            await jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setTorchOff");
         }
 
-        public void ToggleTorch()
+        public async void ToggleTorch()
         {
-            jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.toggleTorch");
+            await jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.toggleTorch");
         }
 
         public async Task<string> Capture(ElementReference canvas)
@@ -110,7 +110,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
         }
 
 #if !NETSTANDARD2_1
-        private string CaptureGetUnMarshalled(IJSUnmarshalledRuntime jS)
+        private static string CaptureGetUnMarshalled(IJSUnmarshalledRuntime jS)
         {
             return jS.InvokeUnmarshalled<string>("BlazorBarcodeScanner.pictureGetBase64Unmarshalled");
         }

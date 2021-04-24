@@ -1,5 +1,4 @@
 ﻿@using Microsoft.JSInterop
-@inject IJSRuntime JSRuntime
 
 <section class="zxing-container" id="zxingContent">
     @if (string.IsNullOrWhiteSpace(Title))
@@ -40,7 +39,7 @@
         {
             <div id="sourceSelectPanel">
                 <label for="zxingSourceSelect">Change video source:</label>
-                <select id="zxingSourceSelect" class="zxing-video-input" @onchange="ChangeVideoInputSource">
+                <select id="zxingSourceSelect" class="zxing-video-input" @onchange="OnVideoInputSourceChanged">
                     @foreach (var videoInputDevice in _videoInputDevices)
                     {
                         <option value="@videoInputDevice.DeviceId">@videoInputDevice.Label</option>
