@@ -109,7 +109,7 @@ window.BlazorBarcodeScanner = {
       /*  this.codeReader.stream.getVideoTracks()[0].applyConstraints({
             advanced: [{ torch: true }] // or false to turn off the torch
         }); */
-        console.log(`Started continous decode from camera with id ${selectedDeviceId}`);
+        console.log(`Started continous decode from camera with id ${this.selectedDeviceId}`);
     },
     stopDecoding: function () {
         this.codeReader.reset();
