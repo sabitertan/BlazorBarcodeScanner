@@ -59,6 +59,8 @@ namespace BlazorBarcodeScanner.ZXing.JS
         [Parameter]
         public EventCallback<BarcodeReceivedEventArgs> OnBarcodeReceived { get; set; }
 
+        public bool IsDecoding { get; protected set; } = false;
+
         public string BarcodeText { get; set; }
 
         public IEnumerable<VideoInputDevice> VideoInputDevices => _videoInputDevices;
@@ -105,6 +107,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
             var width = StreamWidth ?? 0;
             var height = StreamHeight ?? 0;
             _backend.StartDecoding(_video, width, height);
+            IsDecoding = true;
         }
 
         public async Task<string> Capture()
@@ -119,6 +122,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
         {
             BarcodeReaderInterop.OnBarcodeReceived(string.Empty);
             _backend.StopDecoding();
+            IsDecoding = false;
         }
 
         public void UpdateResolution()
