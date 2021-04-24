@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace BlazorBarcodeScanner.ZXing.JS
 {
-    public partial class BarcodeReader
+    public partial class BarcodeReader : ComponentBase
     {
         [Parameter]
         public string Title { get; set; } = "Scan Barcode from Camera";
@@ -59,14 +59,22 @@ namespace BlazorBarcodeScanner.ZXing.JS
         [Parameter]
         public EventCallback<BarcodeReceivedEventArgs> OnBarcodeReceived { get; set; }
 
+        public bool IsDecoding { get; protected set; } = false;
+
         public string BarcodeText { get; set; }
 
         public IEnumerable<VideoInputDevice> VideoInputDevices => _videoInputDevices;
 
         public string SelectedVideoInputId { get; private set; } = string.Empty;
+        
+        [Inject]
+        protected IJSRuntime JSRuntime { get; set; }
 
         private List<VideoInputDevice> _videoInputDevices;
+
         private BarcodeReaderInterop _backend;
+        private ElementReference _video;
+        private ElementReference _canvas;
 
         protected override async Task OnInitializedAsync()
         {
@@ -96,24 +104,29 @@ namespace BlazorBarcodeScanner.ZXing.JS
 
         public void StartDecoding()
         {
-            var width = StreamWidth.HasValue ? StreamWidth.Value : 0;
-            var height = StreamHeight.HasValue ? StreamHeight.Value : 0;
-            _backend.StartDecoding("zxingVideo", width, height);
+            var width = StreamWidth ?? 0;
+            var height = StreamHeight ?? 0;
+            _backend.StartDecoding(_video, width, height);
+            IsDecoding = true;
+        }
+
+        public async Task<string> Capture()
+        {
+            var start = DateTime.Now;
+            var image = await _backend.Capture(_canvas);
+            Console.WriteLine($"Captured in {(DateTime.Now - start).TotalMilliseconds} ms");
+            return image;
         }
 
         public void StopDecoding()
         {
-            BarcodeReceivedEventArgs resetBarcodeArgs = new BarcodeReceivedEventArgs();
-            resetBarcodeArgs.BarcodeText = "";
-            resetBarcodeArgs.TimeReceived = new DateTime();
-            ReceivedBarcodeText(resetBarcodeArgs);
+            BarcodeReaderInterop.OnBarcodeReceived(string.Empty);
             _backend.StopDecoding();
+            IsDecoding = false;
         }
 
         public void UpdateResolution()
         {
-            var width = StreamWidth.HasValue ? StreamWidth.Value : 0;
-            var height = StreamHeight.HasValue ? StreamHeight.Value : 0;
             RestartDecoding();
         }
 
@@ -139,7 +152,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
 
         private async void ReceivedBarcodeText(BarcodeReceivedEventArgs args)
         {
-            this.BarcodeText = args.BarcodeText;
+            BarcodeText = args.BarcodeText;
             await OnBarcodeReceived.InvokeAsync(args);
             StateHasChanged();
         }
@@ -151,7 +164,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
             SelectedVideoInputId = deviceId;
         }
 
-        private void ChangeVideoInputSource(ChangeEventArgs args)
+        protected void OnVideoInputSourceChanged(ChangeEventArgs args)
         {
             ChangeVideoInputSource(args.Value.ToString());
         }

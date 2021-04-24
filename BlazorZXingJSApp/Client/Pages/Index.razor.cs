@@ -14,6 +14,8 @@ namespace BlazorZXingJSApp.Client.Pages
         private string LocalBarcodeText;
         private int _currentVideoSourceIdx = 0;
 
+        private string _imgSrc = string.Empty;
+
         protected override void OnAfterRender(bool firstRender)
         {
             base.OnAfterRender(firstRender);
@@ -44,6 +46,12 @@ namespace BlazorZXingJSApp.Client.Pages
         private void LocalReceivedBarcodeText(BarcodeReceivedEventArgs args)
         {
             this.LocalBarcodeText = args.BarcodeText;
+            StateHasChanged();
+        }
+
+        private async void CapturePicture()
+        {
+            _imgSrc = await _reader.Capture();
             StateHasChanged();
         }
 

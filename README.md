@@ -54,8 +54,7 @@ or with `custom parameters` ( below shows default values of parameters)
     ShowToggleTorch = "true"
     ShowVideoDeviceList="true"
     VideoWidth="300"
-    VideoHeigth="200"
-    OnCodeReceived="LocalReceivedBarcodeText"
+    VideoHeight="200"
  />
 
 ```
@@ -65,7 +64,14 @@ Note that `ShowToggleTorch` is an experimental feature.
 ### Receiving callbacks
 The library raises a custom event, whenever the barcode scanner sucessfully decoded a value from video stream. You can attach to that event using the component's Blazor `EventCallback` named `OnCodeReceived`.
 
-**Note**: Accessing `BlazorBarcodeScanner.ZXing.JS.JsInteropClass.BarcodeReceived` directly is discouraged and will be removed in the future. See the Blazor excerpt in the code block below:
+**Note**: Accessing `BlazorBarcodeScanner.ZXing.JS.JsInteropClass.BarcodeReceived` directly is discuraged and will be removed in the future. See the corresponding fragments in the code blocks below:
+```html
+<BlazorBarcodeScanner.ZXing.JS.BarcodeReader 
+    ...
+    OnCodeReceived="LocalReceivedBarcodeText"
+ />
+```
+
 ```cs
     private string LocalBarcodeText;
 
@@ -76,12 +82,36 @@ The library raises a custom event, whenever the barcode scanner sucessfully deco
     }
 ```
 
+### Capturing a picture from the stream
+In some application it might be useful if a picture can be useful to take a still image of the frame that just decoded the last barcode. Therefor the component features an API call to capture such an image as base64 encoded JPEG image.
+```html
+    <BlazorBarcodeScanner.ZXing.JS.BarcodeReader @ref="_reader"
+        ...
+    />
+    <button @onclick="OnGrabFrame">Grab image</button>
+    <!-- If there is no source URL, we hide the image to avoid he "broken image" icons... -->
+    <img src="@_img"  style="@(string.IsNullOrWhiteSpace(_imgSrc) ? "display:none;" : "")" />
+```
+
+```cs
+    ...
+    private BarcodeReader _reader;
+    private string _img = string.Empty;
+
+    private void OnGrabFrame(MouseEventArgs args)
+    {
+        _imgSrc = await _reader.Capture();
+        StateHasChanged();
+    }
+```
+
 ### Setting stream quality
 While keeping resolution low speeds up image processing, it might yield poor detection performance due to the limited image quality.
 
 In order to allow the application to trade speed for quality, the stream resolution can be set by the application through the following `custom parameters`:
   - StreamWidth
   - StreamHeight
+
 If set to `null` or `0`, a default (browser dependent?) resolution is applied (e.g. 640px by 480px). If set to any number `>0`, the camera stream is requested with the given setting. The settings are used as `ideal` constraint for `getUserMedia` (see [constraints doc](https://developer.mozilla.org/en-US/docs/Web/API/Media_Streams_API/Constraints#specifying_a_range_of_values). Doing so allows for achieving highest resolution by requesting rediculous high numbers for either dimension, causing  the browser to fall back to the maximum feasable for the device of choice.
 
 **Warning**: While increasing the stream resolution might improve your application's code reading performance, it might greatly affect the over all user experience (e.g. through a drop of the frame rate, increased CPU usage, bad battery life, ...) 
