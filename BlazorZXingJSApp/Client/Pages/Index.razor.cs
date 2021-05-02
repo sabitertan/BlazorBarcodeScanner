@@ -1,7 +1,10 @@
 ﻿using BlazorBarcodeScanner.ZXing.JS;
 using Microsoft.AspNetCore.Components.Web;
 using System;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BlazorZXingJSApp.Client.Pages
 {
@@ -52,7 +55,30 @@ namespace BlazorZXingJSApp.Client.Pages
         private async void CapturePicture()
         {
             _imgSrc = await _reader.Capture();
+            // 'data:image/jpeg;base64,/9j/4LfqNdCD3Du....
+            var stringSub = _imgSrc.Split(",")[1];
+            byte[] data = Convert.FromBase64String(stringSub);
+           // var base64Decoded = Encoding.ASCII.GetString(data);
+           // var rawString = Encoding.ASCII.GetBytes(stringSub);
+            using var stream = new MemoryStream(data);
+            var zxText = await RenderZXingNet(stream);
+            stream.Dispose();
             StateHasChanged();
+        }
+
+        public async Task<string> RenderZXingNet(Stream stream) {
+
+            try
+            {
+                using var image = await SixLabors.ImageSharp.Image.LoadAsync<SixLabors.ImageSharp.PixelFormats.Rgba32>(stream);
+                var reader = new ZXing.ImageSharp.BarcodeReader<SixLabors.ImageSharp.PixelFormats.Rgba32>();
+                var result = reader.Decode(image);
+                return result?.Text;
+            }
+            catch (Exception exc)
+            {
+                return exc.Message;
+            }
         }
 
         private void OnVideoSourceNext(MouseEventArgs args)
