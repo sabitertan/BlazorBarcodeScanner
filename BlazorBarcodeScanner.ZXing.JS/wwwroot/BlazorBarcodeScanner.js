@@ -132,7 +132,7 @@ window.BlazorBarcodeScanner = {
     toggleTorch() {
         let track = mediaStreamGetTorchCompatibleTrack(this.codeReader.stream);
         if (track !== null) {
-            let torchStatus = track.getConstraints().torch ? false: true;
+            let torchStatus = !track.getSettings().torch;
             mediaStreamSetTorch(track, torchStatus);
         }
     },
