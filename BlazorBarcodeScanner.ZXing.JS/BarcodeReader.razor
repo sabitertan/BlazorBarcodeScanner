@@ -1,7 +1,7 @@
 ﻿@using Microsoft.JSInterop
 
 <section class="zxing-container">
-    @if (string.IsNullOrWhiteSpace(Title))
+    @if (!string.IsNullOrWhiteSpace(Title))
     {
         <h1 class="zxing-title">@Title</h1>
     }
