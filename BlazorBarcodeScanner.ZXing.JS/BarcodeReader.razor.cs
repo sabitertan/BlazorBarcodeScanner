@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BlazorBarcodeScanner.ZXing.JS
 {
-    public partial class BarcodeReader : ComponentBase
+    public partial class BarcodeReader : ComponentBase, IDisposable
     {
         [Parameter]
         public string Title { get; set; } = "Scan Barcode from Camera";
@@ -115,6 +115,11 @@ namespace BlazorBarcodeScanner.ZXing.JS
                 _backend.SetVideoInputDevice(SelectedVideoInputId);
                 StartDecoding();
             }
+        }
+        
+        public void Dispose()
+        {
+            StopDecoding();
         }
 
         private async Task GetVideoInputDevicesAsync()
