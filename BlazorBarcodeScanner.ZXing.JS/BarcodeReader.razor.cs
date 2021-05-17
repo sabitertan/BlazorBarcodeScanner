@@ -102,12 +102,14 @@ namespace BlazorBarcodeScanner.ZXing.JS
             StartDecoding();
         }
 
-        public void StartDecoding()
+        public async void StartDecoding()
         {
             var width = StreamWidth ?? 0;
             var height = StreamHeight ?? 0;
             _backend.StartDecoding(_video, width, height);
+            SelectedVideoInputId = await _backend.GetVideoInputDevice();
             IsDecoding = true;
+            StateHasChanged();
         }
 
         public async Task<string> Capture()
@@ -123,6 +125,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
             BarcodeReaderInterop.OnBarcodeReceived(string.Empty);
             _backend.StopDecoding();
             IsDecoding = false;
+            StateHasChanged();
         }
 
         public void UpdateResolution()
@@ -161,7 +164,6 @@ namespace BlazorBarcodeScanner.ZXing.JS
         {
             _backend.SetVideoInputDevice(deviceId);
             RestartDecoding();
-            SelectedVideoInputId = deviceId;
         }
 
         protected void OnVideoInputSourceChanged(ChangeEventArgs args)
