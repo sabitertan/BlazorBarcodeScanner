@@ -112,7 +112,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
             BarcodeReaderInterop.BarcodeReceived += ReceivedBarcodeText;
             if (StartCameraAutomatically && _videoInputDevices.Count > 0)
             {
-                _backend.SetVideoInputDevice(_videoInputDevices[0].DeviceId);
+                _backend.SetVideoInputDevice(SelectedVideoInputId);
                 StartDecoding();
             }
         }
