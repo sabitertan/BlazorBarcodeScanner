@@ -62,6 +62,7 @@ or with `custom parameters` ( below shows default values of parameters)
 Note that `ShowToggleTorch` is an experimental feature.
 
 ### Receiving callbacks
+#### OnCodeReceived
 The library raises a custom event, whenever the barcode scanner sucessfully decoded a value from video stream. You can attach to that event using the component's Blazor `EventCallback` named `OnCodeReceived`.
 
 **Note**: Accessing `BlazorBarcodeScanner.ZXing.JS.JsInteropClass.BarcodeReceived` directly is discuraged and will be removed in the future. See the corresponding fragments in the code blocks below:
@@ -81,6 +82,9 @@ The library raises a custom event, whenever the barcode scanner sucessfully deco
         StateHasChanged();
     }
 ```
+
+#### OnDecodingChanged
+In case you need to react on changed decoding states (e.g. hide and display the camera view in your page), you can hook up to this callback.
 
 ### Capturing a picture from the stream
 In some application it might be useful if a picture can be useful to take a still image of the frame that just decoded the last barcode. Therefor the component features an API call to capture such an image as base64 encoded JPEG image.

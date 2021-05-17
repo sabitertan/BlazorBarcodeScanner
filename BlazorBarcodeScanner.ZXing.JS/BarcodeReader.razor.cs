@@ -59,7 +59,33 @@ namespace BlazorBarcodeScanner.ZXing.JS
         [Parameter]
         public EventCallback<BarcodeReceivedEventArgs> OnBarcodeReceived { get; set; }
 
-        public bool IsDecoding { get; protected set; } = false;
+        [Parameter]
+        public EventCallback<DecodingChangedArgs> OnDecodingChanged { get; set; }
+
+        private bool _isDecoding = false;
+        public bool IsDecoding
+        {
+            get
+            {
+                return _isDecoding;
+            }
+
+            protected set
+            {
+                var hasChanged = _isDecoding != value;
+
+                _isDecoding = value;
+                if (hasChanged)
+                {
+                    var args = new DecodingChangedArgs()
+                    {
+                        Sender = this,
+                        IsDecoding = _isDecoding,
+                    };
+                    OnDecodingChanged.InvokeAsync(args);
+                }
+            }
+        }
 
         public string BarcodeText { get; set; }
 
