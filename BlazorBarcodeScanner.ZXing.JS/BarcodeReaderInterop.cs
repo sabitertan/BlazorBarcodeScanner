@@ -45,6 +45,11 @@ namespace BlazorBarcodeScanner.ZXing.JS
             await  jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setSelectedDeviceId", deviceId);
         }
 
+        public async Task<string> GetVideoInputDevice()
+        {
+            return await jSRuntime.InvokeAsync<string>("BlazorBarcodeScanner.getSelectedDeviceId");
+        }
+
         public async void SetVideoResolution(int width, int height)
         {
             await  jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setVideoResolution", width, height);

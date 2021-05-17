@@ -63,6 +63,9 @@ window.BlazorBarcodeScanner = {
     setSelectedDeviceId: function (deviceId) {
         this.selectedDeviceId = deviceId;
     },
+    getSelectedDeviceId: function () {
+        return this.selectedDeviceId;
+    },
     streamWidth: 640,
     streamHeight: 480,
     setVideoResolution: function (width, height) {
@@ -85,11 +88,11 @@ window.BlazorBarcodeScanner = {
 
         return videoConstraints;
     },
-    startDecoding: function (video) {
+    startDecoding: async function (video) {
         var videoConstraints = this.getVideoConstraints();
 
         console.log("Starting decoding with " + videoConstraints);
-        this.codeReader.decodeFromConstraints({ video: videoConstraints }, video, (result, err) => {
+        await this.codeReader.decodeFromConstraints({ video: videoConstraints }, video, (result, err) => {
             if (result) {
                 console.log(result);
                 DotNet.invokeMethodAsync('BlazorBarcodeScanner.ZXing.JS', 'ReceiveBarcode', result.text)
@@ -105,6 +108,9 @@ window.BlazorBarcodeScanner = {
                     });
             }
         });
+
+        // Make sure the actual selectedDeviceId is logged after start decoding.
+        this.selectedDeviceId = this.codeReader.stream.getVideoTracks()[0].getCapabilities()["deviceId"];
          
       /*  this.codeReader.stream.getVideoTracks()[0].applyConstraints({
             advanced: [{ torch: true }] // or false to turn off the torch
