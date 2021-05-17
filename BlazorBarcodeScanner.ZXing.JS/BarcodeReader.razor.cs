@@ -140,10 +140,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
 
         public async Task<string> Capture()
         {
-            var start = DateTime.Now;
-            var image = await _backend.Capture(_canvas);
-            Console.WriteLine($"Captured in {(DateTime.Now - start).TotalMilliseconds} ms");
-            return image;
+            return await _backend.Capture(_canvas);
         }
 
         public void StopDecoding()
