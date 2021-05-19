@@ -107,6 +107,9 @@ window.BlazorBarcodeScanner = {
                         console.log(message);
                     });
             }
+            if (err && (err instanceof ZXing.NotFoundException)) {
+                DotNet.invokeMethodAsync('BlazorBarcodeScanner.ZXing.JS', 'ReceiveNotFound');
+            }
         });
 
         // Make sure the actual selectedDeviceId is logged after start decoding.
