@@ -1,3 +1,4 @@
+using BlazorBarcodeScanner.ZXing.JS.Exceptions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
@@ -32,7 +33,14 @@ namespace BlazorBarcodeScanner.ZXing.JS
 
         public async void StartDecoding(ElementReference video)
         {
-            await jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.startDecoding", video);
+            try
+            {
+                await jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.startDecoding", video);
+            }
+            catch (JSException e)
+            {
+                throw new StartDecodingFailedException(e.Message, e);
+            }
         }
 
         public async void StopDecoding()
