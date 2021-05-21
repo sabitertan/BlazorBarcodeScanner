@@ -25,7 +25,7 @@ dotnet add package BlazorBarcodeScanner.ZXing.JS
 Add following lines to `wwwroot\index.html` (for server side `_Host.cshtml`) before `</body>` tag.
 
 ```html
-    <script src="_content/BlazorBarcodeScanner.ZXing.JS/zxingjs-0.18.4.index.min.js"></script>
+    <script src="_content/BlazorBarcodeScanner.ZXing.JS/zxingjs.index.min.js"></script>
     <script src="_content/BlazorBarcodeScanner.ZXing.JS/BlazorBarcodeScanner.js"></script>
 ```
 
