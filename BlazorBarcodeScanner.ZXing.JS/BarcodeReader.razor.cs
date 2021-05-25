@@ -10,6 +10,9 @@ namespace BlazorBarcodeScanner.ZXing.JS
     public partial class BarcodeReader : ComponentBase, IDisposable
     {
         [Parameter]
+        public bool DecodedPictureCapture { get; set; } = false;
+
+        [Parameter]
         public string Title { get; set; } = "Scan Barcode from Camera";
 
         [Parameter]
@@ -107,6 +110,8 @@ namespace BlazorBarcodeScanner.ZXing.JS
             await base.OnInitializedAsync();
 
             _backend = new BarcodeReaderInterop(JSRuntime);
+            _backend.SetLastDecodedPictureFormat(DecodedPictureCapture ? "image/jpeg" : null);
+
             await GetVideoInputDevicesAsync();
 
             BarcodeReaderInterop.BarcodeReceived += ReceivedBarcodeText;
@@ -146,6 +151,11 @@ namespace BlazorBarcodeScanner.ZXing.JS
         public async Task<string> Capture()
         {
             return await _backend.Capture(_canvas);
+        }
+
+        public async Task<string> CaptureLastDecodedPicture()
+        {
+            return await _backend.GetLastDecodedPicture();
         }
 
         public void StopDecoding()

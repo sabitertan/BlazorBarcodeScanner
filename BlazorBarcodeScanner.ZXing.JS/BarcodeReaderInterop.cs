@@ -72,9 +72,23 @@ namespace BlazorBarcodeScanner.ZXing.JS
 
         public async Task<string> Capture(ElementReference canvas)
         {
-            var result = string.Empty;
-
             await jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.capture", "image/jpeg", canvas);
+            return await PictureGet("capture");
+        }
+
+        internal async void SetLastDecodedPictureFormat(string format)
+        {
+            await jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setLastDecodedPictureFormat", format);
+        }
+
+        public async Task<string> GetLastDecodedPicture()
+        {
+            return await PictureGet("decoded");
+        }
+
+        private async Task<string> PictureGet(string source)
+        {
+            var result = string.Empty;
 
             /* 
              * Due to the size of the expected images, on .NET Core 5.0.5 it proved beneficial to 
@@ -97,29 +111,31 @@ namespace BlazorBarcodeScanner.ZXing.JS
 #if !NETSTANDARD2_1
             if (jSRuntime is IJSUnmarshalledRuntime jS)
             {
-                result = CaptureGetUnMarshalled(jS);
+                result = PictureGetUnMarshalled(jS, source);
             }
             else
             {
-                result = await CaptureGetMarshalled();
+                result = await PictureGetMarshalled(source);
             }
 #else
-            result = await CaptureGetMarshalled();
+            result = await PictureGetMarshalled(source);
 #endif
+
             return result;
         }
 
-        private async Task<string> CaptureGetMarshalled()
+        private async Task<string> PictureGetMarshalled(string source)
         {
-            return await jSRuntime.InvokeAsync<string>("BlazorBarcodeScanner.pictureGetBase64");
+            return await jSRuntime.InvokeAsync<string>("BlazorBarcodeScanner.pictureGetBase64", source);
         }
 
 #if !NETSTANDARD2_1
-        private static string CaptureGetUnMarshalled(IJSUnmarshalledRuntime jS)
+        private static string PictureGetUnMarshalled(IJSUnmarshalledRuntime jS, string source)
         {
-            return jS.InvokeUnmarshalled<string>("BlazorBarcodeScanner.pictureGetBase64Unmarshalled");
+            return jS.InvokeUnmarshalled<string, string>("BlazorBarcodeScanner.pictureGetBase64Unmarshalled", source);
         }
 #endif 
+
         private static string lastCode = string.Empty;
         public static void OnBarcodeReceived(string barcodeText)
         {
