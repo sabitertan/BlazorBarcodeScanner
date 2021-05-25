@@ -27,5 +27,11 @@ namespace BlazorBarcodeScanner.ZXing.JS
              * the rest of the interop from the component's client. */
             BarcodeReaderInterop.OnBarcodeReceived(barcodeText);
         }
+
+        [JSInvokable]
+        public static void ReceiveNotFound()
+        {
+            BarcodeReaderInterop.OnNotFoundReceived();
+        }
     }
 }

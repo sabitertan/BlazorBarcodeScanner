@@ -159,7 +159,17 @@ namespace BlazorBarcodeScanner.ZXing.JS
             BarcodeReceived?.Invoke(args);
         }
 
+        public static void OnNotFoundReceived()
+        {
+            if (!string.IsNullOrEmpty(lastCode))
+            {
+                lastCode = string.Empty;
+                BarcodeNotFound?.Invoke();
+            }
+        }
+
         public static event BarcodeReceivedEventHandler BarcodeReceived;
+        public static event Action BarcodeNotFound;
     }
 
     public class BarcodeReceivedEventArgs : EventArgs
