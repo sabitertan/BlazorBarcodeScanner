@@ -87,7 +87,9 @@ The library raises a custom event, whenever the barcode scanner sucessfully deco
 In case you need to react on changed decoding states (e.g. hide and display the camera view in your page), you can hook up to this callback.
 
 ### Capturing a picture from the stream
-In some application it might be useful if a picture can be useful to take a still image of the frame that just decoded the last barcode. Therefor the component features an API call to capture such an image as base64 encoded JPEG image.
+#### Direct capture
+In some application it might be useful if a picture can be useful to take a still image of the video stream while decoding.
+Therefor the component features an API call to capture such an image as base64 encoded JPEG image.
 ```html
     <BlazorBarcodeScanner.ZXing.JS.BarcodeReader @ref="_reader"
         ...
@@ -108,6 +110,13 @@ In some application it might be useful if a picture can be useful to take a stil
         StateHasChanged();
     }
 ```
+
+##### Retrieving the picture for the last code decoded
+In some application it might be useful if a picture can be useful to take a still image of the frame that just decoded the last barcode. 
+This functionality can be enabled by setting the `DecodedPictureCapture` attribute to `true`. This will cause the component to store last image successfully decoded.
+Upon sucessful deciding (e.g. reception of `OnCodeReceived`), the picture can be accessed by invoking `CaptureLastDecodedPicture`. 
+
+**Warning**: Bear in mind that capturing those pictures might impair performance, CPU load or battery life.
 
 ### Setting stream quality
 While keeping resolution low speeds up image processing, it might yield poor detection performance due to the limited image quality.

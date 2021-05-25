@@ -73,6 +73,8 @@ window.BlazorBarcodeScanner = {
         this.streamHeight = height;
     },
     lastPicture: undefined,
+    lastPictureDecoded: undefined,
+    lastPictureDecodedFormat: undefined,
     getVideoConstraints: function () {
         var videoConstraints = {};
 
@@ -95,6 +97,9 @@ window.BlazorBarcodeScanner = {
         await this.codeReader.decodeFromConstraints({ video: videoConstraints }, video, (result, err) => {
             if (result) {
                 console.log(result);
+                if (this.lastPictureDecodedFormat) {
+                    this.lastPictureDecoded = this.codeReader.captureCanvas.toDataURL(this.lastPictureDecodedFormat);
+                }
                 DotNet.invokeMethodAsync('BlazorBarcodeScanner.ZXing.JS', 'ReceiveBarcode', result.text)
                     .then(message => {
                         console.log(message);
@@ -106,6 +111,10 @@ window.BlazorBarcodeScanner = {
                     .then(message => {
                         console.log(message);
                     });
+            }
+            if (err && (err instanceof ZXing.NotFoundException)) {
+                this.lastPictureDecoded = undefined;
+                DotNet.invokeMethodAsync('BlazorBarcodeScanner.ZXing.JS', 'ReceiveNotFound');
             }
         });
 
@@ -163,10 +172,32 @@ window.BlazorBarcodeScanner = {
                 this.lastPicture = canvas.toDataURL(type);
             });
     },
-    pictureGetBase64Unmarshalled: function () {
-        return BINDING.js_string_to_mono_string(this.lastPicture);
+    pictureGetBase64Unmarshalled: function (source) {
+        var source_str = BINDING.conv_string(source);
+        return BINDING.js_string_to_mono_string(this.pictureGetBase64(source_str));
     },
-    pictureGetBase64: function () {
-        return this.lastPicture;
+    pictureGetBase64: function (source) {
+        var pic = "";
+        switch (source) {
+            case "capture": {
+                pic = this.lastPicture;
+                break;
+            }
+
+            case "decoded": {
+                pic = this.lastPictureDecoded;
+                break;
+            }
+
+            default: {
+                pic = this.lastPicture;
+                break;
+            }
+        }
+        return pic;
     },
+    setLastDecodedPictureFormat: function (format) {
+        this.lastPictureDecoded = undefined;
+        this.lastPictureDecodedFormat = format;
+    }
 };
