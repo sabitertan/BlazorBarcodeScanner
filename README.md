@@ -88,7 +88,7 @@ In case you need to react on changed decoding states (e.g. hide and display the 
 
 ### Capturing a picture from the stream
 #### Direct capture
-In some application it might be useful if a picture can be useful to take a still image of the video stream while decoding.
+In some applications it might be useful to take a still image of the video stream while decoding.
 Therefor the component features an API call to capture such an image as base64 encoded JPEG image.
 ```html
     <BlazorBarcodeScanner.ZXing.JS.BarcodeReader @ref="_reader"
@@ -112,7 +112,7 @@ Therefor the component features an API call to capture such an image as base64 e
 ```
 
 ##### Retrieving the picture for the last code decoded
-In some application it might be useful if a picture can be useful to take a still image of the frame that just decoded the last barcode. 
+In some applications it might be useful to take a still image of the frame that just decoded the last barcode. 
 This functionality can be enabled by setting the `DecodedPictureCapture` attribute to `true`. This will cause the component to store last image successfully decoded.
 Upon sucessful deciding (e.g. reception of `OnCodeReceived`), the picture can be accessed by invoking `CaptureLastDecodedPicture`. 
 
