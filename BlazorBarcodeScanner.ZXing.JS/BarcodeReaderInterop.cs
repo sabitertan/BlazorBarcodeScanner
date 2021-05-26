@@ -163,7 +163,6 @@ namespace BlazorBarcodeScanner.ZXing.JS
                 TimeReceived = DateTime.Now,
             };
 
-            JsInteropClass.OnBarcodeReceived(args);
             BarcodeReceived?.Invoke(args);
         }
 

@@ -46,7 +46,7 @@ Add following component ( with `default parameters `) to anywhere you want in yo
 or with `custom parameters` ( below shows default values of parameters)
 
 ```html
-<BlazorBarcodeScanner.ZXing.JS.BarcodeReader 
+<BlazorBarcodeScanner.ZXing.JS.BarcodeReader
     Title="Scan Barcode from Camera"
     StartCameraAutomatically="false"
     ShowStart="true"
@@ -65,9 +65,10 @@ Note that `ShowToggleTorch` is an experimental feature.
 #### OnCodeReceived
 The library raises a custom event, whenever the barcode scanner sucessfully decoded a value from video stream. You can attach to that event using the component's Blazor `EventCallback` named `OnCodeReceived`.
 
-**Note**: Accessing `BlazorBarcodeScanner.ZXing.JS.JsInteropClass.BarcodeReceived` directly is discouraged and will be removed in the future. See the corresponding fragments in the code blocks below:
+See the corresponding fragments in the code blocks below:
+
 ```html
-<BlazorBarcodeScanner.ZXing.JS.BarcodeReader 
+<BlazorBarcodeScanner.ZXing.JS.BarcodeReader
     ...
     OnCodeReceived="LocalReceivedBarcodeText"
  />
@@ -112,9 +113,9 @@ Therefor the component features an API call to capture such an image as base64 e
 ```
 
 ##### Retrieving the picture for the last code decoded
-In some applications it might be useful to take a still image of the frame that just decoded the last barcode. 
+In some applications it might be useful to take a still image of the frame that just decoded the last barcode.
 This functionality can be enabled by setting the `DecodedPictureCapture` attribute to `true`. This will cause the component to store last image successfully decoded.
-Upon sucessful deciding (e.g. reception of `OnCodeReceived`), the picture can be accessed by invoking `CaptureLastDecodedPicture`. 
+Upon sucessful deciding (e.g. reception of `OnCodeReceived`), the picture can be accessed by invoking `CaptureLastDecodedPicture`.
 
 **Warning**: Bear in mind that capturing those pictures might impair performance, CPU load or battery life.
 
@@ -127,7 +128,7 @@ In order to allow the application to trade speed for quality, the stream resolut
 
 If set to `null` or `0`, a default (browser dependent?) resolution is applied (e.g. 640px by 480px). If set to any number `>0`, the camera stream is requested with the given setting. The settings are used as `ideal` constraint for `getUserMedia` (see [constraints doc](https://developer.mozilla.org/en-US/docs/Web/API/Media_Streams_API/Constraints#specifying_a_range_of_values). Doing so allows for achieving highest resolution by requesting rediculous high numbers for either dimension, causing  the browser to fall back to the maximum feasable for the device of choice.
 
-**Warning**: While increasing the stream resolution might improve your application's code reading performance, it might greatly affect the over all user experience (e.g. through a drop of the frame rate, increased CPU usage, bad battery life, ...) 
+**Warning**: While increasing the stream resolution might improve your application's code reading performance, it might greatly affect the over all user experience (e.g. through a drop of the frame rate, increased CPU usage, bad battery life, ...)
 
 ### Supported Formats
 This library uses auto-detect feature of zxing-js library. It supports variety of barcode types. For more information: [zxing-js supported types](https://github.com/zxing-js/library#supported-formats)

@@ -6,18 +6,6 @@ namespace BlazorBarcodeScanner.ZXing.JS
 {
     public class JsInteropClass
     {
-        [Obsolete("Please use the BarcodeReader control's OnBarcodeReceived Blazor style event callback. This method of registering callbacks is likely to be removed in future releases.")]
-        public static event BarcodeReceivedEventHandler BarcodeReceived;
-
-        /// <summary>
-        /// Invoked through the new, internal interop class (<see cref="BarcodeReaderInterop"/>). 
-        /// Will be removed as soon as <see cref="BarcodeReceived"/> is removed.
-        /// </summary>
-        /// <param name="args"></param>
-        internal static void OnBarcodeReceived(BarcodeReceivedEventArgs args)
-        {
-            BarcodeReceived?.Invoke(args);
-        }
 
         [JSInvokable]
         public static void ReceiveBarcode(string barcodeText)
