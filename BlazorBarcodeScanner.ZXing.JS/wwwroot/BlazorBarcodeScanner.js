@@ -107,7 +107,7 @@ window.BlazorBarcodeScanner = {
             }
             if (err && !(err instanceof ZXing.NotFoundException)) {
                 console.error(err);
-                DotNet.invokeMethodAsync('BlazorBarcodeScanner.ZXing.JS', 'ReceiveBarcode', err)
+                DotNet.invokeMethodAsync('BlazorBarcodeScanner.ZXing.JS', 'ReceiveError', err)
                     .then(message => {
                         console.log(message);
                     });
