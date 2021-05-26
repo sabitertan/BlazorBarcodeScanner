@@ -2,8 +2,8 @@
 
   <PropertyGroup>
 	<TargetFrameworks>net5.0;netstandard2.1</TargetFrameworks>
-    <Version>0.2.3</Version>
-    <Authors>Sabit Igde</Authors>
+    <Version>0.2.4</Version>
+    <Authors>Sabit Igde, Ueli Niederer</Authors>
 	<Company />
 	<Description>Barcode Scanner component for Blazor using zxing-js Interop</Description>
 	<RepositoryUrl>https://github.com/sabitertan/BlazorBarcodeScanner</RepositoryUrl>
