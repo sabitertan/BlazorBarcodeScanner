@@ -96,7 +96,6 @@ window.BlazorBarcodeScanner = {
         console.log("Starting decoding with " + videoConstraints);
         await this.codeReader.decodeFromConstraints({ video: videoConstraints }, video, (result, err) => {
             if (result) {
-                console.log(result);
                 if (this.lastPictureDecodedFormat) {
                     this.lastPictureDecoded = this.codeReader.captureCanvas.toDataURL(this.lastPictureDecodedFormat);
                 }
@@ -106,8 +105,7 @@ window.BlazorBarcodeScanner = {
                     });
             }
             if (err && !(err instanceof ZXing.NotFoundException)) {
-                console.error(err);
-                DotNet.invokeMethodAsync('BlazorBarcodeScanner.ZXing.JS', 'ReceiveBarcode', err)
+                DotNet.invokeMethodAsync('BlazorBarcodeScanner.ZXing.JS', 'ReceiveError', err)
                     .then(message => {
                         console.log(message);
                     });
