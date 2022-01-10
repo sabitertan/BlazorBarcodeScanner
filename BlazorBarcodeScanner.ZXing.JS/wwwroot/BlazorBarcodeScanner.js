@@ -117,7 +117,7 @@ window.BlazorBarcodeScanner = {
         });
 
         // Make sure the actual selectedDeviceId is logged after start decoding.
-        this.selectedDeviceId = this.codeReader.stream.getVideoTracks()[0].getCapabilities()["deviceId"];
+        this.selectedDeviceId = this.codeReader.stream.getVideoTracks()[0].getSettings()["deviceId"];
          
       /*  this.codeReader.stream.getVideoTracks()[0].applyConstraints({
             advanced: [{ torch: true }] // or false to turn off the torch
