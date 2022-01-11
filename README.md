@@ -132,3 +132,6 @@ If set to `null` or `0`, a default (browser dependent?) resolution is applied (e
 
 ### Supported Formats
 This library uses auto-detect feature of zxing-js library. It supports variety of barcode types. For more information: [zxing-js supported types](https://github.com/zxing-js/library#supported-formats)
+
+### ImageCapture Support
+This library uses Media API's ImageCapture, this is an experimental feauture on Firefox. You may want to implement [ImageCapture Polyfill](https://github.com/GoogleChromeLabs/imagecapture-polyfill) in order to use image capturing feature.
