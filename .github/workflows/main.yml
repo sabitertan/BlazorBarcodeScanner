@@ -21,7 +21,8 @@ jobs:
 
     # publishes Blazor project to the release-folder
     - name: Publish .NET Core Project
-      run: dotnet publish BlazorBarcodeScanner/BlazorZXingJSApp/Client/BlazorZXingJSApp.Client.csproj -c Release -o release --nologo
+      run: dotnet publish BlazorZXingJSApp.Client.csproj -c Release -o release --nologo
+      working-directory: BlazorBarcodeScanner/BlazorZXingJSApp/Client
     
     # changes the base-tag in index.html from '/' to 'BlazorGitHubPagesDemo' to match GitHub Pages repository subdirectory
     - name: Change base-tag in index.html from / to BlazorBarcodeScannerDemo
