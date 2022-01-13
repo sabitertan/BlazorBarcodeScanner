@@ -25,7 +25,7 @@ jobs:
     
     # changes the base-tag in index.html from '/' to 'BlazorGitHubPagesDemo' to match GitHub Pages repository subdirectory
     - name: Change base-tag in index.html from / to BlazorBarcodeScannerDemo
-      run: ls -al && sed -i 's/<base href="\/" \/>/<base href="\/BlazorBarcodeScannerDemo\/" \/>/g' wwwroot/index.html
+      run: ls -al && sed -i 's/<base href="\/" \/>/<base href="\/BlazorBarcodeScannerDemo\/" \/>/g' releasewwwroot/index.html
     
     # copy index.html to 404.html to serve the same file when a file is not found
     - name: copy index.html to 404.html
