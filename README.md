@@ -2,6 +2,9 @@
 # BlazorBarcodeScanner
 Barcode Scanner component for Blazor using [zxing-js](https://github.com/zxing-js/library) Interop
 
+##Demo
+[https://sabitertan.github.io/BlazorBarcodeScanner/](https://sabitertan.github.io/BlazorBarcodeScanner/)
+
 ## Prerequisites
 
 Before you continue, please make sure you have the latest version of Visual Studio and .NET 5 installed. Visit official [Blazor](https://dotnet.microsoft.com/apps/aspnet/web-apps/client) site to learn more.
