@@ -24,8 +24,8 @@ jobs:
       run: dotnet publish -f net6.0 -r linux-x64 -c Release -o release --nologo
     
     # changes the base-tag in index.html from '/' to 'BlazorGitHubPagesDemo' to match GitHub Pages repository subdirectory
-    - name: Change base-tag in index.html from / to BlazorBarcodeScannerDemo
-      run: sed -i 's/<base href="\/" \/>/<base href="\/BlazorBarcodeScannerDemo\/" \/>/g' release/wwwroot/index.html
+    - name: Change base-tag in index.html from / to BlazorBarcodeScanner
+      run: sed -i 's/<base href="\/" \/>/<base href="\/BlazorBarcodeScanner\/" \/>/g' release/wwwroot/index.html
     
     # copy index.html to 404.html to serve the same file when a file is not found
     - name: copy index.html to 404.html
