@@ -1,5 +1,5 @@
 ![Nuget](https://img.shields.io/nuget/v/BlazorBarcodeScanner.ZXing.JS?style=flat-square)
-![build](https://github.com/sabitertan/BlazorBarcodeScanner/workflows/main.yml/badge.svg)
+![build](https://github.com/sabitertan/BlazorBarcodeScanner/actions/workflows/main.yml/badge.svg)
 # BlazorBarcodeScanner
 Barcode Scanner component for Blazor using [zxing-js](https://github.com/zxing-js/library) Interop
 
