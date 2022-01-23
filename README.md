@@ -3,7 +3,7 @@
 # BlazorBarcodeScanner
 Barcode Scanner component for Blazor using [zxing-js](https://github.com/zxing-js/library) Interop
 
-##Demo
+## Demo
 [https://sabitertan.github.io/BlazorBarcodeScanner/](https://sabitertan.github.io/BlazorBarcodeScanner/)
 
 ## Prerequisites
