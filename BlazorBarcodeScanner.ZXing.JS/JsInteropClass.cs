@@ -17,11 +17,9 @@ namespace BlazorBarcodeScanner.ZXing.JS
         }
 
         [JSInvokable]
-        public static void ReceiveError(object error)
+        public static void ReceiveError(Exception error)
         {
-            // What to do with the knowledge that an error happened?
-            // Looking at current examples this might indicate issues with one of the decoders
-            // (namely BrowserQRCodeReader appears to throw errors occasionally...)
+            BarcodeReaderInterop.OnErrorReceived(error);
         }
 
         [JSInvokable]

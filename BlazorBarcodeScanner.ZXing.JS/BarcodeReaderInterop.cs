@@ -39,7 +39,14 @@ namespace BlazorBarcodeScanner.ZXing.JS
             }
             catch (JSException e)
             {
-                throw new StartDecodingFailedException(e.Message, e);
+                if (e.Message.IndexOf("Permission denied") > -1 || e.Message.IndexOf("The request is not allowed by the user agent") > -1 )
+                {
+                    OnErrorReceived(new Exception(message: "Camera acces is blocked. Please give access to camera for using barcode scanner."));
+                }
+                else
+                {
+                    throw new StartDecodingFailedException(e.Message, e);
+                }
             }
         }
 
@@ -165,6 +172,20 @@ namespace BlazorBarcodeScanner.ZXing.JS
 
             BarcodeReceived?.Invoke(args);
         }
+        public static void OnErrorReceived(Exception exception)
+        {
+            if (string.IsNullOrEmpty(exception.Message))
+            {
+                return;
+            }
+
+            ErrorReceivedEventArgs args = new ErrorReceivedEventArgs()
+            {
+                Message = exception.Message
+            };
+
+            ErrorReceived?.Invoke(args);
+        }
 
         public static void OnNotFoundReceived()
         {
@@ -176,9 +197,14 @@ namespace BlazorBarcodeScanner.ZXing.JS
         }
 
         public static event BarcodeReceivedEventHandler BarcodeReceived;
+        public static event ErrorReceivedEventHandler ErrorReceived;
+
         public static event Action BarcodeNotFound;
     }
-
+    public class ErrorReceivedEventArgs : EventArgs { 
+        public string Message { get; set; }
+    }
+    public delegate void ErrorReceivedEventHandler(ErrorReceivedEventArgs args);
     public class BarcodeReceivedEventArgs : EventArgs
     {
         public string BarcodeText { get; set; }

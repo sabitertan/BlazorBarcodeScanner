@@ -40,20 +40,6 @@ namespace BlazorBarcodeScanner.ZXing.JS
         public int VideoHeight { get; set; } = 200;
 
         [Parameter]
-        [Obsolete("This parameter is misspelled and rerouted to `VideoHeight`. Please change your reference as the misspelled property is likely to be removed in future releases.")]
-        public int VideoHeigth
-        {
-            get
-            {
-                return VideoHeight;
-            }
-            set
-            {
-                VideoHeight = value;
-            }
-        }
-
-        [Parameter]
         public int? StreamHeight { get; set; } = null;
 
         [Parameter]
@@ -61,6 +47,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
 
         [Parameter]
         public EventCallback<BarcodeReceivedEventArgs> OnBarcodeReceived { get; set; }
+        public EventCallback<ErrorReceivedEventArgs> OnErrorReceived { get; set; }
 
         [Parameter]
         public EventCallback<DecodingChangedArgs> OnDecodingChanged { get; set; }
@@ -91,6 +78,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
         }
 
         public string BarcodeText { get; set; }
+        public string ErrorMessage { get; set; }
 
         public IEnumerable<VideoInputDevice> VideoInputDevices => _videoInputDevices;
 
@@ -115,6 +103,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
             await GetVideoInputDevicesAsync();
 
             BarcodeReaderInterop.BarcodeReceived += ReceivedBarcodeText;
+            BarcodeReaderInterop.ErrorReceived += ReceivedErrorMessage;
             if (StartCameraAutomatically && _videoInputDevices.Count > 0)
             {
                 _backend.SetVideoInputDevice(SelectedVideoInputId);
@@ -140,6 +129,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
 
         public async void StartDecoding()
         {
+            ErrorMessage = null;
             var width = StreamWidth ?? 0;
             var height = StreamHeight ?? 0;
             _backend.StartDecoding(_video, width, height);
@@ -195,6 +185,12 @@ namespace BlazorBarcodeScanner.ZXing.JS
         {
             BarcodeText = args.BarcodeText;
             await OnBarcodeReceived.InvokeAsync(args);
+            StateHasChanged();
+        }
+        private async void ReceivedErrorMessage(ErrorReceivedEventArgs args)
+        {
+            ErrorMessage = args.Message;
+            await OnErrorReceived.InvokeAsync(args);
             StateHasChanged();
         }
 

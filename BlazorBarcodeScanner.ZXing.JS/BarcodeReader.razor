@@ -5,6 +5,12 @@
     {
         <h1 class="zxing-title">@Title</h1>
     }
+    @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+    {
+        <div class="alert alert-danger" role="alert" >
+            @ErrorMessage
+        </div>
+    }
 
     @if (ShowStart || ShowReset || ShowToggleTorch)
     {
