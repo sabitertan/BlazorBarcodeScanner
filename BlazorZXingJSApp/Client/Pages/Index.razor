@@ -1,55 +1,68 @@
 ﻿@page "/"
 @using BlazorBarcodeScanner.ZXing.JS
 @inject IJSRuntime JSRuntime
+<div class="container-fluid">
+    <div class="row">
+        <h2>BlazorBarcodeScanner Demo</h2>
+    </div>
+    <div class="row">
+        <div class="col-sm">   
+        <BlazorBarcodeScanner.ZXing.JS.BarcodeReader 
+            @ref="_reader"
+            StartCameraAutomatically="true"
+            Title="Scanzor"
+            VideoWidth="720"
+            VideoHeight="540"
+            StreamWidth="@StreamWidth"
+            StreamHeight="@StreamHeight"
+            OnBarcodeReceived="LocalReceivedBarcodeText" />
+    </div>
+    <div class="col-sm">
+        <div>
+            <b>Stream Resolution</b>
+            <div>(stop and start the stream to pickup new resolution)</div>
+            <div>
+                <label>Width:
+                    <input style="width: 7em" @bind="StreamWidth" />
+                </label>
+            </div>
+            <div>
+                <label>Height:
+                    <input style="width: 7em" @bind="StreamHeight" />
+                </label>
+            </div>
+            <button @onclick="() => _reader.UpdateResolution()" class="btn btn-outline-primary">Update stream</button>
+        </div>
+        <div class="mt-1">
+            <div><b>Custom Result</b></div>
+            <div class="alert alert-success" role="alert">@(!string.IsNullOrWhiteSpace(LocalBarcodeText)?@LocalBarcodeText:"Results will be here")</div>
+        </div>
+        <div class="mt-1">
+            <b>Custom Controls</b>
+            <div>
+                <button @onclick="() => _reader.StartDecoding()" class="btn btn-outline-primary" >Start</button>
+                <button @onclick="() => _reader.StopDecoding()" class="btn btn-outline-danger">Stop</button>
+                <button @onclick="() => _reader.ToggleTorch()" class="btn btn-outline-warning">Toggle Torch</button>
+                <button @onclick="() => _reader.TorchOn()" class="btn btn-outline-secondary">Torch On</button>
+                <button @onclick="() => _reader.TorchOff()" class="btn btn-outline-danger">Torch Off</button>
+            </div>
+        </div>
 
-<h1>BlazorBarcodeScanner Demo</h1>
+        <div class="mt-1">
+            <b>Custom Source Switch</b>
+            <div>
+                <button @onclick="OnVideoSourceNext" class="btn btn-outline-dark">Next source</button>
+            </div>
+        </div>
+        <div class="mt-1">
+            <div>
+                <button @onclick="CapturePicture" class="btn btn-outline-primary">Capture</button>
+            </div>
+            <div style="max-width:1024px">
+                <img src="@_imgSrc" style="width:100%;height:auto;@(string.IsNullOrWhiteSpace(_imgSrc) ? "display:none;" : "")" />
+            </div>
+        </div>
+    </div>
+    </div>
 
-<h2>Stream resolution:</h2>
-(stop and start the stream to pickup new resolution)
-<table>
-    <tr>
-        <th>Width:</th><td><input style="width: 7em" @bind="StreamWidth" /></td>
-    </tr>
-    <tr>
-        <th>Height:</th><td><input style="width: 7em" @bind="StreamHeight" /></td>
-    </tr>
-</table>
-<button @onclick="() => _reader.UpdateResolution()">Update stream</button>
-
-<BlazorBarcodeScanner.ZXing.JS.BarcodeReader @ref="_reader"
-                                             StartCameraAutomatically="true"
-                                             Title="Scanzor"
-                                             VideoWidth="600"
-                                             VideoHeight="480"
-                                             StreamWidth="@StreamWidth"
-                                             StreamHeight="@StreamHeight"
-                                             OnBarcodeReceived="LocalReceivedBarcodeText" />
-
-<table>
-    <tr>
-        <th>Custom Result:</th>
-        <td>@LocalBarcodeText</td>
-    </tr>
-    <tr>
-        <th>Custom Controls:</th>
-        <td>
-            <button @onclick="() => _reader.StartDecoding()">Start</button>
-            <button @onclick="() => _reader.StopDecoding()">Stop</button>
-            <button @onclick="() => _reader.ToggleTorch()">Toggle Torch</button>
-            <button @onclick="() => _reader.TorchOn()">Torch On</button>
-            <button @onclick="() => _reader.TorchOff()">Torch Off</button>
-        </td>
-    </tr>
-    <tr>
-        <th>Custom Source Switch</th>
-        <td>
-            <button @onclick="OnVideoSourceNext">Next source</button>
-        </td>
-    </tr>
-    <tr>
-        <th style="vertical-align: top;"><button @onclick="CapturePicture">Capture</button></th>
-        <td>
-            <img src="@_imgSrc" style="width:100%;height:auto;@(string.IsNullOrWhiteSpace(_imgSrc) ? "display:none;" : "")" />
-        </td>
-    </tr>
-</table>
+</div>

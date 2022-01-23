@@ -3,7 +3,7 @@
 <section class="zxing-container">
     @if (!string.IsNullOrWhiteSpace(Title))
     {
-        <h1 class="zxing-title">@Title</h1>
+        <h3 class="zxing-title">@Title</h3>
     }
     @if (!string.IsNullOrWhiteSpace(ErrorMessage))
     {
@@ -61,7 +61,7 @@
     @if (ShowResult)
     {
         <div class="zxing-result-container">
-            <label>Result:</label>
+            <b>Result:</b>
             <pre><code class="zxing-result">@BarcodeText</code></pre>
         </div>
     }

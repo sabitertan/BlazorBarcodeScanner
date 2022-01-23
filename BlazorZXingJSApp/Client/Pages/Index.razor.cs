@@ -8,8 +8,8 @@ namespace BlazorZXingJSApp.Client.Pages
     public partial class Index
     {
         private BarcodeReader _reader;
-        private int StreamWidth = 640;
-        private int StreamHeight = 480;
+        private int StreamWidth = 720;
+        private int StreamHeight = 540;
 
         private string LocalBarcodeText;
         private int _currentVideoSourceIdx = 0;
