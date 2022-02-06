@@ -43,10 +43,12 @@ namespace BlazorZXingJSApp.Client.Pages
             return result;
         }
 
-        private void LocalReceivedBarcodeText(BarcodeReceivedEventArgs args)
+        private async void LocalReceivedBarcodeText(BarcodeReceivedEventArgs args)
         {
-            this.LocalBarcodeText = args.BarcodeText;
-            StateHasChanged();
+            await InvokeAsync(() => {
+                this.LocalBarcodeText = args.BarcodeText;
+                StateHasChanged();
+            });
         }
 
         private async void CapturePicture()
