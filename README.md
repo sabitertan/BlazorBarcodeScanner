@@ -91,9 +91,9 @@ See the corresponding fragments in the code blocks below:
 #### OnDecodingChanged
 In case you need to react on changed decoding states (e.g. hide and display the camera view in your page), you can hook up to this callback.
 #### OnErrorReceived
-Library raises this event when an error happens while decoding.
+Library raises this event when there is a generic error happens, for example no video source available or user didn't give permissions.
 #### OnNotFoundReceived
-Library raises this event when there is no video source available.
+Library raises this event when an error happens while decoding.
 
 ### Capturing a picture from the stream
 #### Direct capture
