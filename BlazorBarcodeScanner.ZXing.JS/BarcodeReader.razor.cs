@@ -93,21 +93,21 @@ namespace BlazorBarcodeScanner.ZXing.JS
         private ElementReference _video;
         private ElementReference _canvas;
 
-        protected override async Task OnInitializedAsync()
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            await base.OnInitializedAsync();
+            if (firstRender) {
+                _backend = new BarcodeReaderInterop(JSRuntime);
+                _backend.SetLastDecodedPictureFormat(DecodedPictureCapture ? "image/jpeg" : null);
 
-            _backend = new BarcodeReaderInterop(JSRuntime);
-            _backend.SetLastDecodedPictureFormat(DecodedPictureCapture ? "image/jpeg" : null);
+                await GetVideoInputDevicesAsync();
 
-            await GetVideoInputDevicesAsync();
-
-            BarcodeReaderInterop.BarcodeReceived += ReceivedBarcodeText;
-            BarcodeReaderInterop.ErrorReceived += ReceivedErrorMessage;
-            if (StartCameraAutomatically && _videoInputDevices.Count > 0)
-            {
-                _backend.SetVideoInputDevice(SelectedVideoInputId);
-                StartDecoding();
+                BarcodeReaderInterop.BarcodeReceived += ReceivedBarcodeText;
+                BarcodeReaderInterop.ErrorReceived += ReceivedErrorMessage;
+                if (StartCameraAutomatically && _videoInputDevices.Count > 0)
+                {
+                    _backend.SetVideoInputDevice(SelectedVideoInputId);
+                    StartDecoding();
+                }
             }
         }
         
