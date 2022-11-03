@@ -67,7 +67,7 @@ Note that `ShowToggleTorch` is an experimental feature.
 
 ### Receiving callbacks
 #### OnBarcodeReceived
-The library raises a custom event, whenever the barcode scanner sucessfully decoded a value from video stream. You can attach to that event using the component's Blazor `EventCallback` named `OnCodeReceived`.
+The library raises a custom event, whenever the barcode scanner sucessfully decoded a value from video stream. You can attach to that event using the component's Blazor `EventCallback` named `OnBarcodeReceived`.
 
 See the corresponding fragments in the code blocks below:
 
