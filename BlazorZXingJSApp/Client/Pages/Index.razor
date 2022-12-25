@@ -35,7 +35,7 @@
         </div>
         <div class="mt-1">
             <div><b>Custom Result</b></div>
-            <div class="alert alert-success" role="alert">@(!string.IsNullOrWhiteSpace(LocalBarcodeText)?@LocalBarcodeText:"Results will be here")</div>
+                <div class="alert alert-success" style="word-break: break-all;" role="alert">@(!string.IsNullOrWhiteSpace(LocalBarcodeText) ? @LocalBarcodeText : "Results will be here")</div>
         </div>
         <div class="mt-1">
             <b>Custom Controls</b>
