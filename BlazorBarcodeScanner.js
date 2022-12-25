@@ -123,6 +123,7 @@ window.BlazorBarcodeScanner = {
             advanced: [{ torch: true }] // or false to turn off the torch
         }); */
         console.log(`Started continous decode from camera with id ${this.selectedDeviceId}`);
+        DotNet.invokeMethodAsync('BlazorBarcodeScanner.ZXing.JS', 'DecodingStarted', this.selectedDeviceId)
     },
     stopDecoding: function () {
         this.codeReader.reset();
@@ -130,6 +131,7 @@ window.BlazorBarcodeScanner = {
             .then(message => {
                 console.log(message);
             });
+        DotNet.invokeMethodAsync('BlazorBarcodeScanner.ZXing.JS', 'DecodingStopped', this.selectedDeviceId)
         console.log('Reset camera stream.');
     },
     setTorchOn: function () {
