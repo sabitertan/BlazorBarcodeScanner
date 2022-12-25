@@ -47,7 +47,9 @@ namespace BlazorZXingJSApp.Client.Pages
         {
             await InvokeAsync(() => {
                 this.LocalBarcodeText = args.BarcodeText;
+                
                 StateHasChanged();
+                _reader.StopDecoding();
             });
         }
 

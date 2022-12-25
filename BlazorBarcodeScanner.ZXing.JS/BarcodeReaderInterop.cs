@@ -177,9 +177,41 @@ namespace BlazorBarcodeScanner.ZXing.JS
                 BarcodeNotFound?.Invoke();
             }
         }
+        public static void OnDecodingStarted(string deviceId)
+        {
+            if (string.IsNullOrEmpty(deviceId))
+            {
+                return;
+            }
+
+            DecodingActionEventArgs args = new DecodingActionEventArgs()
+            {
+                DeviceId = deviceId
+            };
+
+            DecodingStarted?.Invoke(args);
+        }
+
+        public static void OnDecodingStopped(string deviceId)
+        {
+            if (string.IsNullOrEmpty(deviceId))
+            {
+                return;
+            }
+
+            DecodingActionEventArgs args = new DecodingActionEventArgs()
+            {
+                DeviceId = deviceId
+            };
+
+            DecodingStopped?.Invoke(args);
+        }
 
         public static event BarcodeReceivedEventHandler BarcodeReceived;
         public static event ErrorReceivedEventHandler ErrorReceived;
+
+        public static event DecodingStartedEventHandler DecodingStarted;
+        public static event DecodingStoppedEventHandler DecodingStopped;
 
         public static event Action BarcodeNotFound;
     }
@@ -194,6 +226,19 @@ namespace BlazorBarcodeScanner.ZXing.JS
     }
 
     public delegate void BarcodeReceivedEventHandler(BarcodeReceivedEventArgs args);
+
+    public class DecodingActionEventArgs : EventArgs
+    {
+        public string DeviceId { get; set; }
+    }
+    public delegate void DecodingStartedEventHandler(DecodingActionEventArgs args);
+
+    public class DecodingStoppedEventArgs : EventArgs
+    {
+        public string DeviceId { get; set; }
+    }
+    public delegate void DecodingStoppedEventHandler(DecodingActionEventArgs args);
+
 
     public class VideoInputDevice
     {

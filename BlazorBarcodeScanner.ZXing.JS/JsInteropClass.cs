@@ -27,5 +27,15 @@ namespace BlazorBarcodeScanner.ZXing.JS
         {
             BarcodeReaderInterop.OnNotFoundReceived();
         }
+        [JSInvokable]
+        public static void DecodingStarted(string deviceId)
+        {
+            BarcodeReaderInterop.OnDecodingStarted(deviceId);
+        }
+        [JSInvokable]
+        public static void DecodingStopped(string deviceId)
+        {
+            BarcodeReaderInterop.OnDecodingStopped(deviceId);
+        }
     }
 }
