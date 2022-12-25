@@ -123,18 +123,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
              *                  
              * As a consequence we try to use the unmarshalled path as often as possible.
              */
-#if !NETSTANDARD2_1
-            if (jSRuntime is IJSUnmarshalledRuntime jS)
-            {
-                result = PictureGetUnMarshalled(jS, source);
-            }
-            else
-            {
-                result = await PictureGetMarshalled(source);
-            }
-#else
             result = await PictureGetMarshalled(source);
-#endif
 
             return result;
         }
@@ -143,13 +132,6 @@ namespace BlazorBarcodeScanner.ZXing.JS
         {
             return await jSRuntime.InvokeAsync<string>("BlazorBarcodeScanner.pictureGetBase64", source);
         }
-
-#if !NETSTANDARD2_1
-        private static string PictureGetUnMarshalled(IJSUnmarshalledRuntime jS, string source)
-        {
-            return jS.InvokeUnmarshalled<string, string>("BlazorBarcodeScanner.pictureGetBase64Unmarshalled", source);
-        }
-#endif 
 
         private static string lastCode = string.Empty;
         public static void OnBarcodeReceived(string barcodeText)
