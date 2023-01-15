@@ -151,7 +151,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
         public void StopDecoding()
         {
             BarcodeReaderInterop.OnBarcodeReceived(string.Empty);
-            _backend.StopDecoding();
+            _backend?.StopDecoding();
             IsDecoding = false;
             StateHasChanged();
         }
