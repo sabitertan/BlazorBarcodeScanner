@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components.Web;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BlazorZXingJSApp.Client.Pages
 {
@@ -43,7 +44,7 @@ namespace BlazorZXingJSApp.Client.Pages
             return result;
         }
 
-        private async void LocalReceivedBarcodeText(BarcodeReceivedEventArgs args)
+        private async Task LocalReceivedBarcodeText(BarcodeReceivedEventArgs args)
         {
             await InvokeAsync(() => {
                 this.LocalBarcodeText = args.BarcodeText;
@@ -53,7 +54,7 @@ namespace BlazorZXingJSApp.Client.Pages
             });
         }
 
-        private async void CapturePicture()
+        private async Task CapturePicture()
         {
             _imgSrc = await _reader.Capture();
             StateHasChanged();

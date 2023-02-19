@@ -31,7 +31,14 @@
     }
 
     <div class="zxing-video-container">
-        <video @ref="_video" width="@VideoWidth" height="@VideoHeight"></video>
+        @if (FullWidthVideo)
+        {
+            <video @ref="_video"></video>
+        } else
+        {
+            <video @ref="_video" width="@VideoWidth" height="@VideoHeight"></video>
+        }
+
     </div>
     <canvas @ref="_canvas" style="display:none;"/>
 

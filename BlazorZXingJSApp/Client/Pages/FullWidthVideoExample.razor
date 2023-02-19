@@ -1,0 +1,47 @@
+﻿@page "/full-width-video"
+@using BlazorBarcodeScanner.ZXing.JS
+@inject IJSRuntime JSRuntime
+
+<style>
+    .zxing-video-container > video{
+        width: 100%;
+    }
+</style>
+<div class="container-fluid">
+    <div class="row">
+        <h2>BlazorBarcodeScanner Full Width</h2>
+    </div>
+    <div class="row">
+        <div class="col-sm">   
+        <BlazorBarcodeScanner.ZXing.JS.BarcodeReader 
+            @ref="_reader"
+            StartCameraAutomatically="true"
+            ShowReset="false"
+            ShowStart="false"
+            ShowVideoDeviceList="false"
+            ShowResult="false"
+            ShowToggleTorch="false"
+            Title="Scanzor"
+            FullWidthVideo="true"
+            StreamWidth="@StreamWidth"
+            StreamHeight="@StreamHeight"
+            OnBarcodeReceived="LocalReceivedBarcodeText" />
+        </div>   
+    </div>
+    <div class="row">
+            <div class="mt-1">
+            <div><b>Custom Result</b></div>
+            <div class="alert alert-success" style="word-break: break-all;" role="alert">@(!string.IsNullOrWhiteSpace(LocalBarcodeText) ? @LocalBarcodeText : "Results will be here")</div>
+        </div>
+        <div class="mt-1">
+            <b>Custom Controls</b>
+            <div>
+                <button @onclick="() => _reader.StartDecoding()" class="btn btn-outline-primary" >Start</button>
+                <button @onclick="() => _reader.StopDecoding()" class="btn btn-outline-danger">Stop</button>
+                <button @onclick="() => _reader.ToggleTorch()" class="btn btn-outline-warning">Toggle Torch</button>
+                <button @onclick="() => _reader.TorchOn()" class="btn btn-outline-secondary">Torch On</button>
+                <button @onclick="() => _reader.TorchOff()" class="btn btn-outline-danger">Torch Off</button>
+            </div>
+        </div>
+    </div>
+</div>

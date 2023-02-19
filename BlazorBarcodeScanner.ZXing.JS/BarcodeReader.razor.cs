@@ -40,6 +40,9 @@ namespace BlazorBarcodeScanner.ZXing.JS
         public int VideoHeight { get; set; } = 200;
 
         [Parameter]
+        public bool FullWidthVideo { get; set; } = false;
+
+        [Parameter]
         public int? StreamHeight { get; set; } = null;
 
         [Parameter]
