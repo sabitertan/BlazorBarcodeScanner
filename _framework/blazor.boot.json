@@ -7,8 +7,8 @@
   "linkerEnabled": true,
   "resources": {
     "assembly": {
-      "BlazorBarcodeScanner.ZXing.JS.dll": "sha256-MZL\/Ssawo23xYJjqs+uRqMcmkCBe\/wWs7j3krH3QuwU=",
-      "BlazorZXingJSApp.Client.dll": "sha256-XVaRHZ8gi0PHi48HY6NKjZhCx+SXF5YIyIus7WD0RAQ=",
+      "BlazorBarcodeScanner.ZXing.JS.dll": "sha256-DGhp9F0DOdQt0bsP4DzI0nsP8WX\/X+rhvhWYGTgHQ1M=",
+      "BlazorZXingJSApp.Client.dll": "sha256-mmtMtJiJll7sNQ4ZRoiXHsxa5ncRwFNcyTsCocfLQf8=",
       "BlazorZXingJSApp.Shared.dll": "sha256-E4rTu9ajquehJdorthUKpdEmZw\/J4lpwjRX5gYJq9gw=",
       "Microsoft.AspNetCore.Components.dll": "sha256-5NU+lppkSwrNPwha4WgijURhFGnmE017XNqnyvuorSM=",
       "Microsoft.AspNetCore.Components.Web.dll": "sha256-zoV3\/gLYW3tAi71QMvRFhuBMIrHTHpYw0ACx0EwDG+E=",
