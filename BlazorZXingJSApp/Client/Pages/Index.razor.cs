@@ -16,6 +16,7 @@ namespace BlazorZXingJSApp.Client.Pages
         private int _currentVideoSourceIdx = 0;
 
         private string _imgSrc = string.Empty;
+        private string _lastError = string.Empty;
 
         protected override void OnAfterRender(bool firstRender)
         {
@@ -46,12 +47,13 @@ namespace BlazorZXingJSApp.Client.Pages
 
         private async Task LocalReceivedBarcodeText(BarcodeReceivedEventArgs args)
         {
-            await InvokeAsync(() => {
-                this.LocalBarcodeText = args.BarcodeText;
-                
-                StateHasChanged();
-                _reader.StopDecoding();
-            });
+            this.LocalBarcodeText = args.BarcodeText;
+            await _reader.StopDecoding();
+        }
+
+        private void LocalReceivedError(ErrorReceivedEventArgs args)
+        {
+            this._lastError = args.Message;
         }
 
         private async Task CapturePicture()
@@ -60,7 +62,7 @@ namespace BlazorZXingJSApp.Client.Pages
             StateHasChanged();
         }
 
-        private void OnVideoSourceNext(MouseEventArgs args)
+        private async Task OnVideoSourceNext(MouseEventArgs args)
         {
             var inputs = _reader.VideoInputDevices.ToList();
 
@@ -75,7 +77,7 @@ namespace BlazorZXingJSApp.Client.Pages
                 _currentVideoSourceIdx = 0;
             }
 
-            _reader.SelectVideoInput(inputs[_currentVideoSourceIdx]);
+            await _reader.SelectVideoInput(inputs[_currentVideoSourceIdx]);
         }
     }
 }

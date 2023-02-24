@@ -1,6 +1,5 @@
 ﻿@page "/"
-@using BlazorBarcodeScanner.ZXing.JS
-@inject IJSRuntime JSRuntime
+
 <div class="container-fluid">
     <div class="row">
         <h2>BlazorBarcodeScanner Demo</h2>
@@ -15,7 +14,8 @@
             VideoHeight="540"
             StreamWidth="@StreamWidth"
             StreamHeight="@StreamHeight"
-            OnBarcodeReceived="LocalReceivedBarcodeText" />
+            OnBarcodeReceived="LocalReceivedBarcodeText"
+            OnErrorReceived="LocalReceivedError"/>
     </div>
     <div class="col-sm">
         <div>
@@ -36,6 +36,10 @@
         <div class="mt-1">
             <div><b>Custom Result</b></div>
                 <div class="alert alert-success" style="word-break: break-all;" role="alert">@(!string.IsNullOrWhiteSpace(LocalBarcodeText) ? @LocalBarcodeText : "Results will be here")</div>
+        </div>
+        <div class="mt-1">
+            <div><b>Errors</b></div>
+            <div class="alert alert-danger" style="word-break: break-all;" role="alert">@(!string.IsNullOrWhiteSpace(_lastError) ? _lastError : "Errors will be here")</div>
         </div>
         <div class="mt-1">
             <b>Custom Controls</b>
