@@ -50,6 +50,8 @@ namespace BlazorBarcodeScanner.ZXing.JS
 
         [Parameter]
         public EventCallback<BarcodeReceivedEventArgs> OnBarcodeReceived { get; set; }
+
+        [Parameter]
         public EventCallback<ErrorReceivedEventArgs> OnErrorReceived { get; set; }
 
         [Parameter]
