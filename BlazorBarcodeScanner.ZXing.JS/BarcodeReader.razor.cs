@@ -120,6 +120,9 @@ namespace BlazorBarcodeScanner.ZXing.JS
 
                     BarcodeReaderInterop.BarcodeReceived += ReceivedBarcodeText;
                     BarcodeReaderInterop.ErrorReceived += ReceivedErrorMessage;
+                    BarcodeReaderInterop.DecodingStarted += DecodingStarted;
+                    BarcodeReaderInterop.DecodingStopped += DecodingStopped;
+
                     if (StartCameraAutomatically && _videoInputDevices.Count > 0)
                     {
                         await _backend.SetVideoInputDevice(SelectedVideoInputId);
@@ -136,13 +139,18 @@ namespace BlazorBarcodeScanner.ZXing.JS
         [Obsolete("Please use DisposeAsync")]
         public void Dispose()
         {
-            StopDecoding();
+            DisposeAsync();
         }
         public async ValueTask DisposeAsync()
         {
             try
             {
                 await StopDecoding();
+                
+                BarcodeReaderInterop.BarcodeReceived -= ReceivedBarcodeText;
+                BarcodeReaderInterop.ErrorReceived -= ReceivedErrorMessage;
+                BarcodeReaderInterop.DecodingStarted -= DecodingStarted;
+                BarcodeReaderInterop.DecodingStopped -= DecodingStopped;
             }
             catch (Exception ex)
             {
@@ -170,7 +178,6 @@ namespace BlazorBarcodeScanner.ZXing.JS
             var height = StreamHeight ?? 0;
             await _backend.StartDecoding(_video, width, height);
             SelectedVideoInputId = await _backend.GetVideoInputDevice();
-            IsDecoding = true;
             StateHasChanged();
         }
 
@@ -200,7 +207,6 @@ namespace BlazorBarcodeScanner.ZXing.JS
         {
             BarcodeReaderInterop.OnBarcodeReceived(string.Empty);
             await _backend.StopDecoding();
-            IsDecoding = false;
             StateHasChanged();
         }
 
@@ -264,6 +270,17 @@ namespace BlazorBarcodeScanner.ZXing.JS
             ErrorMessage = args.Message;
             await OnErrorReceived.InvokeAsync(args);
             StateHasChanged();
+        }
+
+        private Task DecodingStarted(DecodingActionEventArgs _)
+        {
+            IsDecoding = true;
+            return Task.CompletedTask;
+        }
+        private Task DecodingStopped(DecodingActionEventArgs _)
+        {
+            IsDecoding = false;
+            return Task.CompletedTask;
         }
 
         protected async Task ChangeVideoInputSource(string deviceId)
