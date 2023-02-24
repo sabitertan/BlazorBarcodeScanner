@@ -102,27 +102,43 @@ namespace BlazorBarcodeScanner.ZXing.JS
         {
             if (firstRender) {
                 _backend = new BarcodeReaderInterop(JSRuntime);
-                await _backend.SetLastDecodedPictureFormat(DecodedPictureCapture ? "image/jpeg" : null);
-
-                await GetVideoInputDevicesAsync();
-
-                BarcodeReaderInterop.BarcodeReceived += ReceivedBarcodeText;
-                BarcodeReaderInterop.ErrorReceived += ReceivedErrorMessage;
-                if (StartCameraAutomatically && _videoInputDevices.Count > 0)
+                try
                 {
-                    await _backend.SetVideoInputDevice(SelectedVideoInputId);
-                    await StartDecoding();
+                    await _backend.SetLastDecodedPictureFormat(DecodedPictureCapture ? "image/jpeg" : null);
+
+                    await GetVideoInputDevicesAsync();
+
+                    BarcodeReaderInterop.BarcodeReceived += ReceivedBarcodeText;
+                    BarcodeReaderInterop.ErrorReceived += ReceivedErrorMessage;
+                    if (StartCameraAutomatically && _videoInputDevices.Count > 0)
+                    {
+                        await _backend.SetVideoInputDevice(SelectedVideoInputId);
+                        await StartDecoding();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await ReceivedErrorMessage(new ErrorReceivedEventArgs { Message = ex.Message });
                 }
             }
         }
         
+        [Obsolete("Please use DisposeAsync")]
         public void Dispose()
         {
             StopDecoding();
         }
         public async ValueTask DisposeAsync()
         {
-            await StopDecoding();
+            try
+            {
+                await StopDecoding();
+            }
+            catch (Exception ex)
+            {
+                // Too late to do anything about it, but at least fail gracefully
+                Console.WriteLine(ex.ToString());
+            }
         }
 
         private async Task GetVideoInputDevicesAsync()
@@ -147,6 +163,18 @@ namespace BlazorBarcodeScanner.ZXing.JS
             StateHasChanged();
         }
 
+        private async Task StartDecodingSafe()
+        {
+            try
+            {
+                await StartDecoding();
+            }
+            catch (Exception ex)
+            {
+                await OnErrorReceived.InvokeAsync(new ErrorReceivedEventArgs { Message = ex.Message });
+            }
+        }
+
         public async Task<string> Capture()
         {
             return await _backend.Capture(_canvas);
@@ -165,6 +193,18 @@ namespace BlazorBarcodeScanner.ZXing.JS
             StateHasChanged();
         }
 
+        private async Task StopDecodingSafe()
+        {
+            try
+            {
+                await StopDecoding();
+            }
+            catch (Exception ex)
+            {
+                await OnErrorReceived.InvokeAsync(new ErrorReceivedEventArgs { Message = ex.Message });
+            }
+        }
+
         public async Task UpdateResolution()
         {
             await RestartDecoding();
@@ -173,6 +213,18 @@ namespace BlazorBarcodeScanner.ZXing.JS
         public async Task ToggleTorch()
         {
             await _backend.ToggleTorch();
+        }
+
+        private async Task ToggleTorchSafe()
+        {
+            try
+            {
+                await ToggleTorch();
+            }
+            catch (Exception ex)
+            {
+                await OnErrorReceived.InvokeAsync(new ErrorReceivedEventArgs { Message = ex.Message });
+            }
         }
 
         public async Task TorchOn()
@@ -211,7 +263,14 @@ namespace BlazorBarcodeScanner.ZXing.JS
 
         protected async Task OnVideoInputSourceChanged(ChangeEventArgs args)
         {
-            await ChangeVideoInputSource(args.Value.ToString());
+            try
+            {
+                await ChangeVideoInputSource(args.Value.ToString());
+            }
+            catch (Exception ex)
+            {
+                await OnErrorReceived.InvokeAsync(new ErrorReceivedEventArgs { Message = ex.Message });
+            }
         }
     }
 }
