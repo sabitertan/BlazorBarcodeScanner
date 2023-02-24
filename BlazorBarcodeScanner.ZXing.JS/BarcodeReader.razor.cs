@@ -108,12 +108,15 @@ namespace BlazorBarcodeScanner.ZXing.JS
         protected ElementReference _video;
         protected ElementReference _canvas;
 
+        protected bool _DecodedPictureCapture;
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender) {
                 _backend = new BarcodeReaderInterop(JSRuntime);
                 try
                 {
+                    _DecodedPictureCapture = DecodedPictureCapture;
                     await _backend.SetLastDecodedPictureFormat(DecodedPictureCapture ? "image/jpeg" : null);
 
                     await GetVideoInputDevicesAsync();
@@ -133,6 +136,15 @@ namespace BlazorBarcodeScanner.ZXing.JS
                 {
                     await ReceivedErrorMessage(new ErrorReceivedEventArgs { Message = ex.Message });
                 }
+            }
+        }
+        
+        protected override async Task OnParametersSetAsync()
+        {
+            if (_DecodedPictureCapture != DecodedPictureCapture)
+            {
+                _DecodedPictureCapture = DecodedPictureCapture;
+                await _backend.SetLastDecodedPictureFormat(DecodedPictureCapture ? "image/jpeg" : null);
             }
         }
         
