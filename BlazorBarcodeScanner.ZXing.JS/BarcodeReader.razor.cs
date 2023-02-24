@@ -60,11 +60,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
         private bool _isDecoding = false;
         public bool IsDecoding
         {
-            get
-            {
-                return _isDecoding;
-            }
-
+            get => _isDecoding;
             protected set
             {
                 var hasChanged = _isDecoding != value;
@@ -86,8 +82,22 @@ namespace BlazorBarcodeScanner.ZXing.JS
         public string ErrorMessage { get; set; }
 
         public IEnumerable<VideoInputDevice> VideoInputDevices => _videoInputDevices;
+        [Parameter]
+        public EventCallback<IEnumerable<VideoInputDevice>> VideoInputDevicesChanged { get; set; }
 
-        public string SelectedVideoInputId { get; protected set; } = string.Empty;
+        private string _SelectedVideoInputId = string.Empty;
+        [Parameter]
+        public EventCallback<string> SelectedVideoInputIdChanged { get; set; }
+
+        public string SelectedVideoInputId
+        {
+            get => _SelectedVideoInputId;
+            protected set
+            {
+                _SelectedVideoInputId = value;
+                SelectedVideoInputIdChanged.InvokeAsync(value);
+            }
+        }
         
         [Inject]
         protected IJSRuntime JSRuntime { get; set; }
@@ -144,6 +154,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
         protected async Task GetVideoInputDevicesAsync()
         {
             _videoInputDevices = await _backend.GetVideoInputDevices("get");
+            await VideoInputDevicesChanged.InvokeAsync(_videoInputDevices);
         }
 
         protected async Task RestartDecoding()
@@ -257,6 +268,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
 
         protected async Task ChangeVideoInputSource(string deviceId)
         {
+            SelectedVideoInputId = deviceId;
             await _backend.SetVideoInputDevice(deviceId);
             await RestartDecoding();
         }

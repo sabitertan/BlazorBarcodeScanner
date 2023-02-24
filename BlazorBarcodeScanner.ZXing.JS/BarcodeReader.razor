@@ -56,7 +56,7 @@
                     <select class="zxing-video-select" @onchange="OnVideoInputSourceChanged">
                         @foreach (var videoInputDevice in _videoInputDevices)
                         {
-                            <option value="@videoInputDevice.DeviceId">@videoInputDevice.Label</option>
+                            <option value="@videoInputDevice.DeviceId" selected="@(SelectedVideoInputId == @videoInputDevice.DeviceId)">@videoInputDevice.Label</option>
                         }
                     </select>
                 </label>
