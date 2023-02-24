@@ -87,16 +87,16 @@ namespace BlazorBarcodeScanner.ZXing.JS
 
         public IEnumerable<VideoInputDevice> VideoInputDevices => _videoInputDevices;
 
-        public string SelectedVideoInputId { get; private set; } = string.Empty;
+        public string SelectedVideoInputId { get; protected set; } = string.Empty;
         
         [Inject]
         protected IJSRuntime JSRuntime { get; set; }
 
-        private List<VideoInputDevice> _videoInputDevices;
+        protected List<VideoInputDevice> _videoInputDevices;
 
         private BarcodeReaderInterop _backend;
-        private ElementReference _video;
-        private ElementReference _canvas;
+        protected ElementReference _video;
+        protected ElementReference _canvas;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -141,12 +141,12 @@ namespace BlazorBarcodeScanner.ZXing.JS
             }
         }
 
-        private async Task GetVideoInputDevicesAsync()
+        protected async Task GetVideoInputDevicesAsync()
         {
             _videoInputDevices = await _backend.GetVideoInputDevices("get");
         }
 
-        private async Task RestartDecoding()
+        protected async Task RestartDecoding()
         {
             await StopDecoding();
             await StartDecoding();
