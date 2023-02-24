@@ -25,13 +25,13 @@ namespace BlazorBarcodeScanner.ZXing.JS
                 message);
         }
 
-        public void StartDecoding(ElementReference video, int width, int height)
+        public async Task StartDecoding(ElementReference video, int width, int height)
         {
-            SetVideoResolution(width, height);
-            StartDecoding(video);
+            await SetVideoResolution(width, height);
+            await StartDecoding(video);
         }
 
-        public async void StartDecoding(ElementReference video)
+        public async Task StartDecoding(ElementReference video)
         {
             try
             {
@@ -50,12 +50,12 @@ namespace BlazorBarcodeScanner.ZXing.JS
             }
         }
 
-        public async void StopDecoding()
+        public async Task StopDecoding()
         {
             await  jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.stopDecoding");
         }
 
-        public async void SetVideoInputDevice(string deviceId)
+        public async Task SetVideoInputDevice(string deviceId)
         {
             await  jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setSelectedDeviceId", deviceId);
         }
@@ -65,22 +65,22 @@ namespace BlazorBarcodeScanner.ZXing.JS
             return await jSRuntime.InvokeAsync<string>("BlazorBarcodeScanner.getSelectedDeviceId");
         }
 
-        public async void SetVideoResolution(int width, int height)
+        public async Task SetVideoResolution(int width, int height)
         {
             await  jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setVideoResolution", width, height);
         }
 
-        public async void SetTorchOn()
+        public async Task SetTorchOn()
         {
             await  jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setTorchOn");
         }
 
-        public async void SetTorchOff()
+        public async Task SetTorchOff()
         {
             await jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setTorchOff");
         }
 
-        public async void ToggleTorch()
+        public async Task ToggleTorch()
         {
             await jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.toggleTorch");
         }
@@ -91,7 +91,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
             return await PictureGet("capture");
         }
 
-        internal async void SetLastDecodedPictureFormat(string format)
+        internal async Task SetLastDecodedPictureFormat(string format)
         {
             await jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setLastDecodedPictureFormat", format);
         }
@@ -218,26 +218,26 @@ namespace BlazorBarcodeScanner.ZXing.JS
     public class ErrorReceivedEventArgs : EventArgs { 
         public string Message { get; set; }
     }
-    public delegate void ErrorReceivedEventHandler(ErrorReceivedEventArgs args);
+    public delegate Task ErrorReceivedEventHandler(ErrorReceivedEventArgs args);
     public class BarcodeReceivedEventArgs : EventArgs
     {
         public string BarcodeText { get; set; }
         public DateTime TimeReceived { get; set; } = new DateTime();
     }
 
-    public delegate void BarcodeReceivedEventHandler(BarcodeReceivedEventArgs args);
+    public delegate Task BarcodeReceivedEventHandler(BarcodeReceivedEventArgs args);
 
     public class DecodingActionEventArgs : EventArgs
     {
         public string DeviceId { get; set; }
     }
-    public delegate void DecodingStartedEventHandler(DecodingActionEventArgs args);
+    public delegate Task DecodingStartedEventHandler(DecodingActionEventArgs args);
 
     public class DecodingStoppedEventArgs : EventArgs
     {
         public string DeviceId { get; set; }
     }
-    public delegate void DecodingStoppedEventHandler(DecodingActionEventArgs args);
+    public delegate Task DecodingStoppedEventHandler(DecodingActionEventArgs args);
 
 
     public class VideoInputDevice
