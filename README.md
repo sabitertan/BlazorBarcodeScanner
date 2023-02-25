@@ -94,6 +94,10 @@ In case you need to react on changed decoding states (e.g. hide and display the 
 Library raises this event when there is a generic error happens, for example no video source available or user didn't give permissions.
 #### OnNotFoundReceived
 Library raises this event when an error happens while decoding.
+#### VideoInputDevicesChanged
+Library raises this event when the list of available input devices changes.
+#### SelectedVideoInputIdChanged
+Library raises this event when the selected video device changes.
 
 ### Capturing a picture from the stream
 #### Direct capture
