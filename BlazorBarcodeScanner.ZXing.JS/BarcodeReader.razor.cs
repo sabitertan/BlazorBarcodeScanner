@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BlazorBarcodeScanner.ZXing.JS
 {
-    public partial class BarcodeReader : ComponentBase, IDisposable
+    public partial class BarcodeReader : ComponentBase, IDisposable, IAsyncDisposable
     {
         [Parameter]
         public bool DecodedPictureCapture { get; set; } = false;
@@ -50,6 +50,8 @@ namespace BlazorBarcodeScanner.ZXing.JS
 
         [Parameter]
         public EventCallback<BarcodeReceivedEventArgs> OnBarcodeReceived { get; set; }
+
+        [Parameter]
         public EventCallback<ErrorReceivedEventArgs> OnErrorReceived { get; set; }
 
         [Parameter]
@@ -58,11 +60,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
         private bool _isDecoding = false;
         public bool IsDecoding
         {
-            get
-            {
-                return _isDecoding;
-            }
-
+            get => _isDecoding;
             protected set
             {
                 var hasChanged = _isDecoding != value;
@@ -84,61 +82,127 @@ namespace BlazorBarcodeScanner.ZXing.JS
         public string ErrorMessage { get; set; }
 
         public IEnumerable<VideoInputDevice> VideoInputDevices => _videoInputDevices;
+        [Parameter]
+        public EventCallback<IEnumerable<VideoInputDevice>> VideoInputDevicesChanged { get; set; }
 
-        public string SelectedVideoInputId { get; private set; } = string.Empty;
+        private string _SelectedVideoInputId = string.Empty;
+        [Parameter]
+        public EventCallback<string> SelectedVideoInputIdChanged { get; set; }
+
+        public string SelectedVideoInputId
+        {
+            get => _SelectedVideoInputId;
+            protected set
+            {
+                _SelectedVideoInputId = value;
+                SelectedVideoInputIdChanged.InvokeAsync(value);
+            }
+        }
         
         [Inject]
         protected IJSRuntime JSRuntime { get; set; }
 
-        private List<VideoInputDevice> _videoInputDevices;
+        protected List<VideoInputDevice> _videoInputDevices;
 
         private BarcodeReaderInterop _backend;
-        private ElementReference _video;
-        private ElementReference _canvas;
+        protected ElementReference _video;
+        protected ElementReference _canvas;
+
+        protected bool _DecodedPictureCapture;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender) {
                 _backend = new BarcodeReaderInterop(JSRuntime);
-                _backend.SetLastDecodedPictureFormat(DecodedPictureCapture ? "image/jpeg" : null);
-
-                await GetVideoInputDevicesAsync();
-
-                BarcodeReaderInterop.BarcodeReceived += ReceivedBarcodeText;
-                BarcodeReaderInterop.ErrorReceived += ReceivedErrorMessage;
-                if (StartCameraAutomatically && _videoInputDevices.Count > 0)
+                try
                 {
-                    _backend.SetVideoInputDevice(SelectedVideoInputId);
-                    StartDecoding();
+                    _DecodedPictureCapture = DecodedPictureCapture;
+                    await _backend.SetLastDecodedPictureFormat(DecodedPictureCapture ? "image/jpeg" : null);
+
+                    await GetVideoInputDevicesAsync();
+
+                    BarcodeReaderInterop.BarcodeReceived += ReceivedBarcodeText;
+                    BarcodeReaderInterop.ErrorReceived += ReceivedErrorMessage;
+                    BarcodeReaderInterop.DecodingStarted += DecodingStarted;
+                    BarcodeReaderInterop.DecodingStopped += DecodingStopped;
+
+                    if (StartCameraAutomatically && _videoInputDevices.Count > 0)
+                    {
+                        await _backend.SetVideoInputDevice(SelectedVideoInputId);
+                        await StartDecoding();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await ReceivedErrorMessage(new ErrorReceivedEventArgs { Message = ex.Message });
                 }
             }
         }
         
+        protected override async Task OnParametersSetAsync()
+        {
+            if (_DecodedPictureCapture != DecodedPictureCapture)
+            {
+                _DecodedPictureCapture = DecodedPictureCapture;
+                await _backend.SetLastDecodedPictureFormat(DecodedPictureCapture ? "image/jpeg" : null);
+            }
+        }
+        
+        [Obsolete("Please use DisposeAsync")]
         public void Dispose()
         {
-            StopDecoding();
+            DisposeAsync();
+        }
+        public async ValueTask DisposeAsync()
+        {
+            try
+            {
+                await StopDecoding();
+                
+                BarcodeReaderInterop.BarcodeReceived -= ReceivedBarcodeText;
+                BarcodeReaderInterop.ErrorReceived -= ReceivedErrorMessage;
+                BarcodeReaderInterop.DecodingStarted -= DecodingStarted;
+                BarcodeReaderInterop.DecodingStopped -= DecodingStopped;
+            }
+            catch (Exception ex)
+            {
+                // Too late to do anything about it, but at least fail gracefully
+                Console.WriteLine(ex.ToString());
+            }
         }
 
-        private async Task GetVideoInputDevicesAsync()
+        protected async Task GetVideoInputDevicesAsync()
         {
             _videoInputDevices = await _backend.GetVideoInputDevices("get");
+            await VideoInputDevicesChanged.InvokeAsync(_videoInputDevices);
         }
 
-        private void RestartDecoding()
+        protected async Task RestartDecoding()
         {
-            StopDecoding();
-            StartDecoding();
+            await StopDecoding();
+            await StartDecoding();
         }
 
-        public async void StartDecoding()
+        public async Task StartDecoding()
         {
             ErrorMessage = null;
             var width = StreamWidth ?? 0;
             var height = StreamHeight ?? 0;
-            _backend.StartDecoding(_video, width, height);
+            await _backend.StartDecoding(_video, width, height);
             SelectedVideoInputId = await _backend.GetVideoInputDevice();
-            IsDecoding = true;
             StateHasChanged();
+        }
+
+        private async Task StartDecodingSafe()
+        {
+            try
+            {
+                await StartDecoding();
+            }
+            catch (Exception ex)
+            {
+                await OnErrorReceived.InvokeAsync(new ErrorReceivedEventArgs { Message = ex.Message });
+            }
         }
 
         public async Task<string> Capture()
@@ -151,61 +215,103 @@ namespace BlazorBarcodeScanner.ZXing.JS
             return await _backend.GetLastDecodedPicture();
         }
 
-        public void StopDecoding()
+        public async Task StopDecoding()
         {
             BarcodeReaderInterop.OnBarcodeReceived(string.Empty);
-            _backend?.StopDecoding();
-            IsDecoding = false;
+            await _backend.StopDecoding();
             StateHasChanged();
         }
 
-        public void UpdateResolution()
+        private async Task StopDecodingSafe()
         {
-            RestartDecoding();
+            try
+            {
+                await StopDecoding();
+            }
+            catch (Exception ex)
+            {
+                await OnErrorReceived.InvokeAsync(new ErrorReceivedEventArgs { Message = ex.Message });
+            }
         }
 
-        public void ToggleTorch()
+        public async Task UpdateResolution()
         {
-            _backend.ToggleTorch();
+            await RestartDecoding();
         }
 
-        public void TorchOn()
+        public async Task ToggleTorch()
         {
-            _backend.SetTorchOn();
+            await _backend.ToggleTorch();
         }
 
-        public void TorchOff()
+        private async Task ToggleTorchSafe()
         {
-            _backend.SetTorchOff();
+            try
+            {
+                await ToggleTorch();
+            }
+            catch (Exception ex)
+            {
+                await OnErrorReceived.InvokeAsync(new ErrorReceivedEventArgs { Message = ex.Message });
+            }
         }
 
-        public void SelectVideoInput(VideoInputDevice device)
+        public async Task TorchOn()
         {
-            ChangeVideoInputSource(device.DeviceId);
+            await _backend.SetTorchOn();
         }
 
-        private async void ReceivedBarcodeText(BarcodeReceivedEventArgs args)
+        public async Task TorchOff()
+        {
+            await _backend.SetTorchOff();
+        }
+
+        public async Task SelectVideoInput(VideoInputDevice device)
+        {
+            await ChangeVideoInputSource(device.DeviceId);
+        }
+
+        private async Task ReceivedBarcodeText(BarcodeReceivedEventArgs args)
         {
             BarcodeText = args.BarcodeText;
             await OnBarcodeReceived.InvokeAsync(args);
             StateHasChanged();
         }
-        private async void ReceivedErrorMessage(ErrorReceivedEventArgs args)
+        private async Task ReceivedErrorMessage(ErrorReceivedEventArgs args)
         {
             ErrorMessage = args.Message;
             await OnErrorReceived.InvokeAsync(args);
             StateHasChanged();
         }
 
-        protected void ChangeVideoInputSource(string deviceId)
+        private Task DecodingStarted(DecodingActionEventArgs _)
         {
-            _backend.SetVideoInputDevice(deviceId);
-            RestartDecoding();
+            IsDecoding = true;
+            return Task.CompletedTask;
+        }
+        private Task DecodingStopped(DecodingActionEventArgs _)
+        {
+            IsDecoding = false;
+            return Task.CompletedTask;
         }
 
-        protected void OnVideoInputSourceChanged(ChangeEventArgs args)
+        protected async Task ChangeVideoInputSource(string deviceId)
         {
-            ChangeVideoInputSource(args.Value.ToString());
+            SelectedVideoInputId = deviceId;
+            await _backend.SetVideoInputDevice(deviceId);
+            await RestartDecoding();
+        }
+
+        protected async Task OnVideoInputSourceChanged(ChangeEventArgs args)
+        {
+            try
+            {
+                await ChangeVideoInputSource(args.Value.ToString());
+            }
+            catch (Exception ex)
+            {
+                await OnErrorReceived.InvokeAsync(new ErrorReceivedEventArgs { Message = ex.Message });
+            }
         }
     }
 }
