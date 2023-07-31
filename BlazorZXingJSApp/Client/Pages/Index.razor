@@ -10,12 +10,22 @@
             @ref="_reader"
             StartCameraAutomatically="true"
             Title="Scanzor"
-            VideoWidth="720"
-            VideoHeight="540"
+            VideoWidth="400"
+            VideoHeight="400"
             StreamWidth="@StreamWidth"
             StreamHeight="@StreamHeight"
             OnBarcodeReceived="LocalReceivedBarcodeText"
-            OnErrorReceived="LocalReceivedError"/>
+            OnErrorReceived="LocalReceivedError"
+            
+            SelectStartCameraAutomatically="2"
+            TextWithoutDevices="Presione iniciar"
+            LabelVideoDeviceListText="Seleccionar camara:"
+            ButtonResetText="Reiniciar"
+            ButtonStopText="Detener"
+            ButtonStartText="Iniciar"
+            ButtonToggleTorchText="Conmutar linterna"
+            
+            />
     </div>
     <div class="col-sm">
         <div>
