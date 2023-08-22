@@ -10,6 +10,24 @@ namespace BlazorBarcodeScanner.ZXing.JS
     public partial class BarcodeReader : ComponentBase, IDisposable, IAsyncDisposable
     {
         [Parameter]
+        public string TextWithoutDevices { get; set; } = "looking for devices";
+
+        [Parameter]
+        public string LabelVideoDeviceListText { get; set; } = "Change video source:";
+
+        [Parameter]
+        public string ButtonStartText { get; set; } = "Start";
+
+        [Parameter]
+        public string ButtonResetText { get; set; } = "Reset";
+
+        [Parameter]
+        public string ButtonStopText { get; set; } = "Stop";
+
+        [Parameter]
+        public string ButtonToggleTorchText { get; set; } = "Toggle Torch";
+
+        [Parameter]
         public bool DecodedPictureCapture { get; set; } = false;
 
         [Parameter]
@@ -20,6 +38,9 @@ namespace BlazorBarcodeScanner.ZXing.JS
 
         [Parameter]
         public bool ShowStart { get; set; } = true;
+
+        [Parameter]
+        public bool ShowStop { get; set; } = true;
 
         [Parameter]
         public bool ShowReset { get; set; } = true;
@@ -232,6 +253,12 @@ namespace BlazorBarcodeScanner.ZXing.JS
             {
                 await OnErrorReceived.InvokeAsync(new ErrorReceivedEventArgs { Message = ex.Message });
             }
+        }
+
+        private async Task RestartDecodingSafe()
+        {
+            await StopDecodingSafe();
+            await StartDecodingSafe();
         }
 
         public async Task UpdateResolution()

@@ -12,20 +12,32 @@
         </div>
     }
 
-    @if (ShowStart || ShowReset || ShowToggleTorch)
+    @if (ShowStart || ShowReset || ShowToggleTorch || ShowStop)
     {
         <div>
             @if (ShowStart)
             {
-                <button class="zxing-button start" @onclick="StartDecodingSafe">Start</button>
+                <button class="zxing-button start" @onclick="StartDecodingSafe">
+                    @ButtonStartText
+                </button>
+            }
+            @if (ShowStop)
+            {
+                <button class="zxing-button stop" @onclick="StopDecodingSafe">
+                    @ButtonStopText
+                </button>
             }
             @if (ShowReset)
             {
-                <button class="zxing-button stop" @onclick="StopDecodingSafe">Stop</button>
+                <button class="zxing-button stop" @onclick="RestartDecodingSafe">
+                    @ButtonResetText
+                </button>
             }
             @if (ShowToggleTorch)
             {
-                <button class="zxing-button torch" @onclick="ToggleTorchSafe">Toggle Torch</button>
+                <button class="zxing-button torch" @onclick="ToggleTorchSafe">
+                    @ButtonToggleTorchText
+                </button>
             }
         </div>
     }
@@ -46,13 +58,13 @@
     {
         @if (_videoInputDevices == null)
         {
-            <p>looking for devices</p>
+            <p>@TextWithoutDevices</p>
         }
         else
         {
             <div class="zxing-source-select-container">
                 <label>
-                    Change video source:
+                    @LabelVideoDeviceListText
                     <select class="zxing-video-select" @onchange="OnVideoInputSourceChanged">
                         @foreach (var videoInputDevice in _videoInputDevices)
                         {
