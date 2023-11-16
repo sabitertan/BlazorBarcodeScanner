@@ -1,4 +1,35 @@
 console.log("Init BlazorBarcodeScanner");
+
+class Helpers {
+    static dotNetHelper;
+
+    static setDotNetHelper(value) {
+        Helpers.dotNetHelper = value;
+    }
+
+    static async receiveBarcode(text) {
+        await Helpers.dotNetHelper.invokeMethodAsync('OnBarcodeReceived', text);
+    }
+
+    static async receiveError(err) {
+        await Helpers.dotNetHelper.invokeMethodAsync('OnErrorReceived', err);
+    }
+
+    static async receiveNotFound() {
+        await Helpers.dotNetHelper.invokeMethodAsync('OnNotFoundReceived');
+    }
+
+    static async decodingStarted(deviceId) {
+        await Helpers.dotNetHelper.invokeMethodAsync('OnDecodingStarted', deviceId);
+    }
+
+    static async decodingStopped(deviceId) {
+        await Helpers.dotNetHelper.invokeMethodAsync('OnDecodingStopped', deviceId);
+    }
+}
+
+window.Helpers = Helpers;
+
 async function mediaStreamSetTorch(track, onOff) {
     await track.applyConstraints({
         advanced: [{
@@ -99,20 +130,20 @@ window.BlazorBarcodeScanner = {
                 if (this.lastPictureDecodedFormat) {
                     this.lastPictureDecoded = this.codeReader.captureCanvas.toDataURL(this.lastPictureDecodedFormat);
                 }
-                DotNet.invokeMethodAsync('BlazorBarcodeScanner.ZXing.JS', 'ReceiveBarcode', result.text)
+                Helpers.receiveBarcode(result.text)
                     .then(message => {
                         console.log(message);
                     });
             }
             if (err && !(err instanceof ZXing.NotFoundException)) {
-                DotNet.invokeMethodAsync('BlazorBarcodeScanner.ZXing.JS', 'ReceiveError', err)
+                Helpers.receiveError(err)
                     .then(message => {
                         console.log(message);
                     });
             }
             if (err && (err instanceof ZXing.NotFoundException)) {
                 this.lastPictureDecoded = undefined;
-                DotNet.invokeMethodAsync('BlazorBarcodeScanner.ZXing.JS', 'ReceiveNotFound');
+                Helpers.receiveNotFound();
             }
         });
 
@@ -123,15 +154,15 @@ window.BlazorBarcodeScanner = {
             advanced: [{ torch: true }] // or false to turn off the torch
         }); */
         console.log(`Started continous decode from camera with id ${this.selectedDeviceId}`);
-        DotNet.invokeMethodAsync('BlazorBarcodeScanner.ZXing.JS', 'DecodingStarted', this.selectedDeviceId)
+        Helpers.decodingStarted(this.selectedDeviceId)
     },
     stopDecoding: function () {
         this.codeReader.reset();
-        DotNet.invokeMethodAsync('BlazorBarcodeScanner.ZXing.JS', 'ReceiveBarcode', '')
+        Helpers.receiveBarcode('')
             .then(message => {
                 console.log(message);
             });
-        DotNet.invokeMethodAsync('BlazorBarcodeScanner.ZXing.JS', 'DecodingStopped', this.selectedDeviceId)
+        Helpers.decodingStopped(this.selectedDeviceId)
         console.log('Reset camera stream.');
     },
     setTorchOn: function () {

@@ -133,8 +133,9 @@ namespace BlazorBarcodeScanner.ZXing.JS
             return await jSRuntime.InvokeAsync<string>("BlazorBarcodeScanner.pictureGetBase64", source);
         }
 
-        private static string lastCode = string.Empty;
-        public static void OnBarcodeReceived(string barcodeText)
+        private string lastCode = string.Empty;
+        [JSInvokable]
+        public  void OnBarcodeReceived(string barcodeText)
         {
             if (string.IsNullOrEmpty(barcodeText))
             {
@@ -154,7 +155,8 @@ namespace BlazorBarcodeScanner.ZXing.JS
 
             BarcodeReceived?.Invoke(args);
         }
-        public static void OnErrorReceived(Exception exception)
+        [JSInvokable]
+        public  void OnErrorReceived(Exception exception)
         {
             if (string.IsNullOrEmpty(exception.Message))
             {
@@ -168,8 +170,8 @@ namespace BlazorBarcodeScanner.ZXing.JS
 
             ErrorReceived?.Invoke(args);
         }
-
-        public static void OnNotFoundReceived()
+        [JSInvokable]
+        public void OnNotFoundReceived()
         {
             if (!string.IsNullOrEmpty(lastCode))
             {
@@ -177,7 +179,8 @@ namespace BlazorBarcodeScanner.ZXing.JS
                 BarcodeNotFound?.Invoke();
             }
         }
-        public static void OnDecodingStarted(string deviceId)
+        [JSInvokable]
+        public  void OnDecodingStarted(string deviceId)
         {
             if (string.IsNullOrEmpty(deviceId))
             {
@@ -191,8 +194,8 @@ namespace BlazorBarcodeScanner.ZXing.JS
 
             DecodingStarted?.Invoke(args);
         }
-
-        public static void OnDecodingStopped(string deviceId)
+        [JSInvokable]
+        public  void OnDecodingStopped(string deviceId)
         {
             if (string.IsNullOrEmpty(deviceId))
             {
@@ -207,13 +210,13 @@ namespace BlazorBarcodeScanner.ZXing.JS
             DecodingStopped?.Invoke(args);
         }
 
-        public static event BarcodeReceivedEventHandler BarcodeReceived;
-        public static event ErrorReceivedEventHandler ErrorReceived;
+        public  event BarcodeReceivedEventHandler BarcodeReceived;
+        public  event ErrorReceivedEventHandler ErrorReceived;
 
-        public static event DecodingStartedEventHandler DecodingStarted;
-        public static event DecodingStoppedEventHandler DecodingStopped;
+        public  event DecodingStartedEventHandler DecodingStarted;
+        public  event DecodingStoppedEventHandler DecodingStopped;
 
-        public static event Action BarcodeNotFound;
+        public  event Action BarcodeNotFound;
     }
     public class ErrorReceivedEventArgs : EventArgs { 
         public string Message { get; set; }
