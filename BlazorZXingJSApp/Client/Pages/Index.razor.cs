@@ -22,19 +22,16 @@ namespace BlazorZXingJSApp.Client.Pages
         {
             base.OnAfterRender(firstRender);
 
-            if (firstRender)
+            if (firstRender && !string.IsNullOrWhiteSpace(_reader.SelectedVideoInputId))
             {
-                if (!string.IsNullOrWhiteSpace(_reader.SelectedVideoInputId))
-                {
-                    _currentVideoSourceIdx = SourceIndexFromId();
-                }
+                _currentVideoSourceIdx = SourceIndexFromId();
             }
         }
 
         private int SourceIndexFromId()
         {
-            int result = 0;
             var inputs = _reader.VideoInputDevices.ToList();
+            int result;
             for (result = 0; result < inputs.Count; result++)
             {
                 if (inputs[result].DeviceId.Equals(_reader.SelectedVideoInputId))

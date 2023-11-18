@@ -32,8 +32,8 @@ namespace BlazorZXingJSApp.Client.Pages
 
         private int SourceIndexFromId()
         {
-            int result = 0;
             var inputs = _reader.VideoInputDevices.ToList();
+            int result;
             for (result = 0; result < inputs.Count; result++)
             {
                 if (inputs[result].DeviceId.Equals(_reader.SelectedVideoInputId))
@@ -46,11 +46,11 @@ namespace BlazorZXingJSApp.Client.Pages
 
         private async Task LocalReceivedBarcodeText(BarcodeReceivedEventArgs args)
         {
-            await InvokeAsync(() => {
+            await InvokeAsync(async () => {
                 this.LocalBarcodeText = args.BarcodeText;
                 
                 StateHasChanged();
-                _reader.StopDecoding();
+                await _reader.StopDecoding();
             });
         }
     }

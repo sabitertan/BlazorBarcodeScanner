@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 	<TargetFrameworks>net7.0;net6.0</TargetFrameworks>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <Authors>Sabit Igde, Ueli Niederer</Authors>
 	<Company />
 	<Description>Barcode Scanner component for Blazor using zxing-js Interop</Description>

@@ -103,27 +103,26 @@ namespace BlazorBarcodeScanner.ZXing.JS
 
         private async Task<string> PictureGet(string source)
         {
-            var result = string.Empty;
 
             /* 
-             * Due to the size of the expected images, on .NET Core 5.0.5 it proved beneficial to 
-             * transfer the string unmarshalled rather than having it packed through the standard 
-             * mechanisms. Brief benchmarks on a recent PC over three FullHD snapshots in a row 
-             * yielded following results (in milliseconds):
-             * 
-             *  Edge 90.0.818.42:
-             *      Capturing:                  309     217     336     389
-             *      Transfer:   Marshalled      600     534     638     618
-             *                  Unmarshalled      9        3     10       4
-             *
-             *  Chrome 90.0.4430.85:
-             *      Capturing:                  334     231     338     233
-             *      Transfer:   Marshalled      571     453     466     451
-             *                  Unmarshalled     11       5      11       2
-             *                  
-             * As a consequence we try to use the unmarshalled path as often as possible.
-             */
-            result = await PictureGetMarshalled(source);
+ * Due to the size of the expected images, on .NET Core 5.0.5 it proved beneficial to 
+ * transfer the string unmarshalled rather than having it packed through the standard 
+ * mechanisms. Brief benchmarks on a recent PC over three FullHD snapshots in a row 
+ * yielded following results (in milliseconds):
+ * 
+ *  Edge 90.0.818.42:
+ *      Capturing:                  309     217     336     389
+ *      Transfer:   Marshalled      600     534     638     618
+ *                  Unmarshalled      9        3     10       4
+ *
+ *  Chrome 90.0.4430.85:
+ *      Capturing:                  334     231     338     233
+ *      Transfer:   Marshalled      571     453     466     451
+ *                  Unmarshalled     11       5      11       2
+ *                  
+ * As a consequence we try to use the unmarshalled path as often as possible.
+ */
+            string result = await PictureGetMarshalled(source);
 
             return result;
         }
