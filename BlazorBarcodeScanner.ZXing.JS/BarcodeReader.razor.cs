@@ -79,6 +79,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
         public EventCallback<DecodingChangedArgs> OnDecodingChanged { get; set; }
 
         private bool _isDecoding = false;
+        private DotNetObjectReference<BarcodeReaderInterop>? dotNetHelper;
         public bool IsDecoding
         {
             get => _isDecoding;
@@ -135,6 +136,8 @@ namespace BlazorBarcodeScanner.ZXing.JS
         {
             if (firstRender) {
                 _backend = new BarcodeReaderInterop(JSRuntime);
+                dotNetHelper = DotNetObjectReference.Create(_backend);
+                await JSRuntime.InvokeVoidAsync("Helpers.setDotNetHelper", dotNetHelper);
                 try
                 {
                     _DecodedPictureCapture = DecodedPictureCapture;
@@ -142,10 +145,10 @@ namespace BlazorBarcodeScanner.ZXing.JS
 
                     await GetVideoInputDevicesAsync();
 
-                    BarcodeReaderInterop.BarcodeReceived += ReceivedBarcodeText;
-                    BarcodeReaderInterop.ErrorReceived += ReceivedErrorMessage;
-                    BarcodeReaderInterop.DecodingStarted += DecodingStarted;
-                    BarcodeReaderInterop.DecodingStopped += DecodingStopped;
+                    _backend.BarcodeReceived += ReceivedBarcodeText;
+                    _backend.ErrorReceived += ReceivedErrorMessage;
+                    _backend.DecodingStarted += DecodingStarted;
+                    _backend.DecodingStopped += DecodingStopped;
 
                     if (StartCameraAutomatically && _videoInputDevices.Count > 0)
                     {
@@ -179,11 +182,11 @@ namespace BlazorBarcodeScanner.ZXing.JS
             try
             {
                 await StopDecoding();
-                
-                BarcodeReaderInterop.BarcodeReceived -= ReceivedBarcodeText;
-                BarcodeReaderInterop.ErrorReceived -= ReceivedErrorMessage;
-                BarcodeReaderInterop.DecodingStarted -= DecodingStarted;
-                BarcodeReaderInterop.DecodingStopped -= DecodingStopped;
+
+                _backend.BarcodeReceived -= ReceivedBarcodeText;
+                _backend.ErrorReceived -= ReceivedErrorMessage;
+                _backend.DecodingStarted -= DecodingStarted;
+                _backend.DecodingStopped -= DecodingStopped;
             }
             catch (Exception ex)
             {
@@ -238,7 +241,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
 
         public async Task StopDecoding()
         {
-            BarcodeReaderInterop.OnBarcodeReceived(string.Empty);
+            _backend.OnBarcodeReceived(string.Empty);
             await _backend.StopDecoding();
             StateHasChanged();
         }
