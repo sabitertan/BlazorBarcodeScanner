@@ -17,11 +17,11 @@ jobs:
     - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 7.x
+        dotnet-version: 8.x
 
     # publishes Blazor project to the release-folder
     - name: Publish .NET Core Project
-      run: dotnet publish BlazorZXingJSApp/Client/BlazorZXingJSApp.Client.csproj -f net7.0 -r linux-x64 -c Release -o release --nologo --self-contained 
+      run: dotnet publish BlazorZXingJSApp/Client/BlazorZXingJSApp.Client.csproj -f net8.0 -r linux-x64 -c Release -o release --nologo --self-contained 
       
     # changes the base-tag in index.html from '/' to 'BlazorGitHubPagesDemo' to match GitHub Pages repository subdirectory
     - name: Change base-tag in index.html from / to BlazorBarcodeScanner
