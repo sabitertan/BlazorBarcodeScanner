@@ -1,0 +1,92 @@
+﻿@using Microsoft.JSInterop
+
+<section class="zxing-container">
+    @if (!string.IsNullOrWhiteSpace(Title))
+    {
+        <h3 class="zxing-title">@Title</h3>
+    }
+    @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+    {
+        <div class="alert alert-danger" role="alert" >
+            @ErrorMessage
+        </div>
+    }
+
+    @if (ShowStart || ShowReset || ShowToggleTorch || ShowStop)
+    {
+        <div>
+            @if (ShowStart)
+            {
+                <button class="zxing-button start" @onclick="StartDecodingSafe">
+                    @ButtonStartText
+                </button>
+            }
+            @if (ShowStop)
+            {
+                <button class="zxing-button stop" @onclick="StopDecodingSafe">
+                    @ButtonStopText
+                </button>
+            }
+            @if (ShowReset)
+            {
+                <button class="zxing-button stop" @onclick="RestartDecodingSafe">
+                    @ButtonResetText
+                </button>
+            }
+            @if (ShowToggleTorch)
+            {
+                <button class="zxing-button torch" @onclick="ToggleTorchSafe">
+                    @ButtonToggleTorchText
+                </button>
+            }
+        </div>
+    }
+
+    <div class="zxing-video-container">
+        <canvas id="video-canvas" width="@VideoWidth" height="@VideoHeight"> 
+        @if (FullWidthVideo)
+        {
+            <video @ref="_video"></video>
+        } else
+        {
+            <video @ref="_video" width="@VideoWidth" height="@VideoHeight"></video>
+        }
+        </canvas>
+
+        <div id="result"></div>
+
+    </div>
+    <canvas @ref="_canvas" style="display:none;" id="capture"/>
+
+    @if (ShowVideoDeviceList)
+    {
+        @if (_videoInputDevices == null)
+        {
+            <p>@TextWithoutDevices</p>
+        }
+        else
+        {
+            <div class="zxing-source-select-container">
+                <label>
+                    @LabelVideoDeviceListText
+                    <select class="zxing-video-select" @onchange="OnVideoInputSourceChanged">
+                        @foreach (var videoInputDevice in _videoInputDevices)
+                        {
+                            <option value="@videoInputDevice.DeviceId" selected="@(SelectedVideoInputId == @videoInputDevice.DeviceId)">@videoInputDevice.Label</option>
+                        }
+                    </select>
+                </label>
+            </div>
+
+        }
+    }
+
+    @if (ShowResult)
+    {
+        <div class="zxing-result-container">
+            <b>Result:</b>
+            <div class="zxing-result" style="word-break: break-all;">@BarcodeText</div>
+        </div>
+    }
+    
+</section>

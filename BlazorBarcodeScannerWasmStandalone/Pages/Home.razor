@@ -1,0 +1,73 @@
+﻿@page "/"
+
+<div class="container-fluid">
+    <div class="row">
+        <h2>BlazorBarcodeScanner Demo</h2>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <BlazorBarcodeScanner.ZXing.Cpp.BarcodeReader @ref="_reader"
+                                                         StartCameraAutomatically="true"
+                                                         Title="Scanzor"
+                                                         VideoWidth="720"
+                                                         VideoHeight="540"
+                                                         StreamWidth="@StreamWidth"
+                                                         StreamHeight="@StreamHeight"
+                                                         OnBarcodeReceived="LocalReceivedBarcodeText"
+                                                         OnErrorReceived="LocalReceivedError" />
+        </div>
+        <div class="col-sm">
+            <div>
+                <b>Stream Resolution</b>
+                <div>(stop and start the stream to pickup new resolution)</div>
+                <div>
+                    <label>
+                        Width:
+                        <input style="width: 7em" @bind="StreamWidth" />
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        Height:
+                        <input style="width: 7em" @bind="StreamHeight" />
+                    </label>
+                </div>
+                <button @onclick="() => _reader.UpdateResolution()" class="btn btn-outline-primary">Update stream</button>
+            </div>
+            <div class="mt-1">
+                <div><b>Custom Result</b></div>
+                <div class="alert alert-success" style="word-break: break-all;" role="alert">@(!string.IsNullOrWhiteSpace(LocalBarcodeText) ? @LocalBarcodeText : "Results will be here")</div>
+            </div>
+            <div class="mt-1">
+                <div><b>Errors</b></div>
+                <div class="alert alert-danger" style="word-break: break-all;" role="alert">@(!string.IsNullOrWhiteSpace(_lastError) ? _lastError : "Errors will be here")</div>
+            </div>
+            <div class="mt-1">
+                <b>Custom Controls</b>
+                <div>
+                    <button @onclick="() => _reader.StartDecoding()" class="btn btn-outline-primary">Start</button>
+                    <button @onclick="() => _reader.StopDecoding()" class="btn btn-outline-danger">Stop</button>
+                    <button @onclick="() => _reader.ToggleTorch()" class="btn btn-outline-warning">Toggle Torch</button>
+                    <button @onclick="() => _reader.TorchOn()" class="btn btn-outline-secondary">Torch On</button>
+                    <button @onclick="() => _reader.TorchOff()" class="btn btn-outline-danger">Torch Off</button>
+                </div>
+            </div>
+
+            <div class="mt-1">
+                <b>Custom Source Switch</b>
+                <div>
+                    <button @onclick="OnVideoSourceNext" class="btn btn-outline-dark">Next source</button>
+                </div>
+            </div>
+            <div class="mt-1">
+                <div>
+                    <button @onclick="CapturePicture" class="btn btn-outline-primary">Capture</button>
+                </div>
+                <div style="max-width:1024px">
+                    <img src="@_imgSrc" style="width:100%;height:auto;@(string.IsNullOrWhiteSpace(_imgSrc) ? "display:none;" : "")" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -1,6 +1,4 @@
 ﻿using BlazorBarcodeScanner.ZXing.JS;
-using Microsoft.AspNetCore.Components.Web;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 
