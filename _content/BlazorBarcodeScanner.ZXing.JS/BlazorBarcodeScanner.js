@@ -34,7 +34,7 @@ async function mediaStreamSetTorch(track, onOff) {
     await track.applyConstraints({
         advanced: [{
             fillLightMode: onOff ? 'flash' : 'off',
-            torch: onOff ? true : false,
+            torch: !!onOff,
         }],
     });
 }
@@ -107,7 +107,7 @@ window.BlazorBarcodeScanner = {
     lastPictureDecoded: undefined,
     lastPictureDecodedFormat: undefined,
     getVideoConstraints: function () {
-        var videoConstraints = {};
+        let videoConstraints = {};
 
         if (!this.selectedDeviceId) {
             videoConstraints["facingMode"] = 'environment';
@@ -122,7 +122,7 @@ window.BlazorBarcodeScanner = {
         return videoConstraints;
     },
     startDecoding: async function (video) {
-        var videoConstraints = this.getVideoConstraints();
+        let videoConstraints = this.getVideoConstraints();
 
         console.log("Starting decoding with " + videoConstraints);
         await this.codeReader.decodeFromConstraints({ video: videoConstraints }, video, (result, err) => {
@@ -189,11 +189,11 @@ window.BlazorBarcodeScanner = {
             return "";
         }
 
-        var capture = new ImageCapture(this.codeReader.stream.getVideoTracks()[0]);
+        let capture = new ImageCapture(this.codeReader.stream.getVideoTracks()[0]);
 
         await capture.grabFrame()
             .then(bitmap => {
-                var context = canvas.getContext('2d');
+                let context = canvas.getContext('2d');
 
                 canvas.width = bitmap.width;
                 canvas.height = bitmap.height;
@@ -204,11 +204,11 @@ window.BlazorBarcodeScanner = {
             });
     },
     pictureGetBase64Unmarshalled: function (source) {
-        var source_str = BINDING.conv_string(source);
+        let source_str = BINDING.conv_string(source);
         return BINDING.js_string_to_mono_string(this.pictureGetBase64(source_str));
     },
     pictureGetBase64: function (source) {
-        var pic = "";
+        let pic = "";
         switch (source) {
             case "capture": {
                 pic = this.lastPicture;

@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "BlazorZXingJSApp.Client",
   "resources": {
-    "hash": "sha256-ph5G+nKzK7k9Cy+NlUqdW8VG+J4ipJGnorMmGcAgoy4=",
+    "hash": "sha256-cmRGINziv5VNVYY+sv2K052yaDKRHHDY7zlacgucKEY=",
     "jsModuleNative": {
       "dotnet.native.8.0.0.45ykigla5r.js": "sha256-LjLDIz9+J7uuiwMlQ4HbNx2BnSpphOtO2MwkoI28vdI="
     },
@@ -17,9 +17,9 @@
       "icudt_no_CJK.dat": "sha256-L7sV7NEYP37/Qr2FPCePo5cJqRgTXRwGHuwF5Q+0Nfs="
     },
     "assembly": {
-      "BlazorBarcodeScanner.ZXing.JS.wasm": "sha256-TXx3VsvfwA8eMuo4ESB8v+/eNX2gZ1I/d2thkodn6QM=",
-      "BlazorZXingJSApp.Client.wasm": "sha256-QNtjbU81dLiZNwKa6VvgawAgRyzW9ozVRnpcgI5T8i0=",
-      "BlazorZXingJSApp.Shared.wasm": "sha256-R12/UfMIN6FQoKYpnPNbckPYo+9r280MhOMjxmfFNo8=",
+      "BlazorBarcodeScanner.ZXing.JS.wasm": "sha256-GiZ3e781hXOrlBbgAJ7d01rvmW7jqByFhfbXuzpM4Y8=",
+      "BlazorZXingJSApp.Client.wasm": "sha256-7l5LBT8lh0EbVkjFZFYkh8bDnPyKDOHwX3v2HHMhAyc=",
+      "BlazorZXingJSApp.Shared.wasm": "sha256-MrJXYVR8TQFvhVgn7EszFDi4RevBZjq03v9RsY22ogw=",
       "Microsoft.AspNetCore.Components.wasm": "sha256-rC3ymTYhf3GMmxMAhjPrpTCTCPh9LH7G1NkOPewbRIg=",
       "Microsoft.AspNetCore.Components.Web.wasm": "sha256-bfNAl/j/8mLDC2zCSPHCbE4K8QarsuIMT8kvBfsQjxY=",
       "Microsoft.AspNetCore.Components.WebAssembly.wasm": "sha256-Ws5szf6fWPAXna+XyWsAhavx+WDFcA/91DQ7iPRPCMs=",
