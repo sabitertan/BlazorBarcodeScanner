@@ -46,10 +46,10 @@
         <canvas id="video-canvas" width="@VideoWidth" height="@VideoHeight"> 
         @if (FullWidthVideo)
         {
-            <video @ref="_video"></video>
+            <video style="@VideoElementStyle" @ref="_video"></video>
         } else
         {
-            <video @ref="_video" width="@VideoWidth" height="@VideoHeight"></video>
+            <video style="@VideoElementStyle" @ref="_video" width="@VideoWidth" height="@VideoHeight"></video>
         }
         </canvas>
 

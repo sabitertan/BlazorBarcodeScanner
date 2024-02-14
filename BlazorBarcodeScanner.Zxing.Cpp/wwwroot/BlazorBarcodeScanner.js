@@ -327,26 +327,17 @@ window.BlazorBarcodeScanner = {
             mediaStreamSetTorch(track, torchStatus);
         }
     },
-    capture: async function (type, canvas) {
+    capture: async function (type, canvas,video) {
         this.lastPicture = "";
 
         if (!this.codeReader.stream) {
             return "";
         }
 
-        let capture = new ImageCapture(this.codeReader.stream.getVideoTracks()[0]);
-
-        await capture.grabFrame()
-            .then(bitmap => {
-                let context = canvas.getContext('2d');
-
-                canvas.width = bitmap.width;
-                canvas.height = bitmap.height;
-
-                context.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height);
-
-                this.lastPicture = canvas.toDataURL(type);
-            });
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        this.lastPicture = canvas.toDataURL('image/png');
     },
     pictureGetBase64Unmarshalled: function (source) {
         let source_str = BINDING.conv_string(source);

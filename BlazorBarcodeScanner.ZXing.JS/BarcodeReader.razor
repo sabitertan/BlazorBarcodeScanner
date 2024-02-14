@@ -45,10 +45,10 @@
     <div class="zxing-video-container">
         @if (FullWidthVideo)
         {
-            <video @ref="_video"></video>
+            <video style="@VideoElementStyle" @ref="_video"></video>
         } else
         {
-            <video @ref="_video" width="@VideoWidth" height="@VideoHeight"></video>
+            <video style="@VideoElementStyle" @ref="_video" width="@VideoWidth" height="@VideoHeight"></video>
         }
 
     </div>

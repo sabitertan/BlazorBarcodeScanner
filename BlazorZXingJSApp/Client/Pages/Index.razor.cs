@@ -16,6 +16,7 @@ namespace BlazorZXingJSApp.Client.Pages
 
         private string _imgSrc = string.Empty;
         private string _lastError = string.Empty;
+        public string VideoElementStyle { get; set; } = "";
 
         protected override void OnAfterRender(bool firstRender)
         {
