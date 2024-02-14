@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace BlazorBarcodeScanner.ZXing.Cpp
@@ -65,6 +66,12 @@ namespace BlazorBarcodeScanner.ZXing.Cpp
         [Parameter]
         public int? StreamWidth { get; set; } = null;
 
+        [Parameter]
+#if NET8_0
+        [StringSyntax("css")]
+#endif
+        public string VideoElementStyle { get; set; } ="";
+        
         [Parameter]
         public EventCallback<BarcodeReceivedEventArgs> OnBarcodeReceived { get; set; }
 

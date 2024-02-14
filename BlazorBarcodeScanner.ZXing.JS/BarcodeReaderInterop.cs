@@ -85,9 +85,9 @@ namespace BlazorBarcodeScanner.ZXing.JS
             await jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.toggleTorch");
         }
 
-        public async Task<string> Capture(ElementReference canvas)
+        public async Task<string> Capture(ElementReference canvas, ElementReference video)
         {
-            await jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.capture", "image/jpeg", canvas);
+            await jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.capture", "image/jpeg", canvas,video);
             return await PictureGet("capture");
         }
 

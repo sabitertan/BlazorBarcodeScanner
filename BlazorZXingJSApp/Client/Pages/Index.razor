@@ -14,6 +14,7 @@
             VideoHeight="540"
             StreamWidth="@StreamWidth"
             StreamHeight="@StreamHeight"
+            VideoElementStyle="@VideoElementStyle"
             OnBarcodeReceived="LocalReceivedBarcodeText"
             OnErrorReceived="LocalReceivedError"/>
     </div>
@@ -32,6 +33,15 @@
                 </label>
             </div>
             <button @onclick="() => _reader.UpdateResolution()" class="btn btn-outline-primary">Update stream</button>
+        </div>
+        <div>
+            <b>Video element styling</b>
+            <div>(updates on enter or on focus loss)</div>
+            <div>
+                <label>Style:
+                    <input style="width: 7em" @bind="VideoElementStyle"  />
+                </label>
+            </div>
         </div>
         <div class="mt-1">
             <div><b>Custom Result</b></div>

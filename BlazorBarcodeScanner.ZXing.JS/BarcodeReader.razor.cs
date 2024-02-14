@@ -2,6 +2,7 @@
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace BlazorBarcodeScanner.ZXing.JS
@@ -67,6 +68,13 @@ namespace BlazorBarcodeScanner.ZXing.JS
 
         [Parameter]
         public int? StreamWidth { get; set; } = null;
+        
+        [Parameter]
+
+#if NET8_0
+        [StringSyntax("css")]
+#endif
+        public string VideoElementStyle { get; set; }
 
         [Parameter]
         public EventCallback<BarcodeReceivedEventArgs> OnBarcodeReceived { get; set; }
@@ -230,7 +238,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
 
         public async Task<string> Capture()
         {
-            return await _backend.Capture(_canvas);
+            return await _backend.Capture(_canvas,_video);
         }
 
         public async Task<string> CaptureLastDecodedPicture()
