@@ -1,16 +1,20 @@
-﻿@inherits LayoutComponentBase
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+@inherits LayoutComponentBase
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+<div class="shell">
+    <header class="appbar">
+        <div class="appbar__inner">
+            <span class="appbar__brand">
+                <span class="appbar__mark" aria-hidden="true"></span>
+                BlazorBarcodeScanner
+            </span>
+            <a class="appbar__link"
+               href="https://github.com/sabitertan/BlazorBarcodeScanner"
+               target="_blank"
+               rel="noopener">GitHub</a>
         </div>
+    </header>
 
-        <article class="content px-4">
-            @Body
-        </article>
+    <main class="shell__body">
+        @Body
     </main>
 </div>

@@ -1,0 +1,293 @@
+.intro {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+}
+
+.intro__title {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+}
+
+.intro__text {
+    margin: 0;
+    max-width: 60ch;
+    color: var(--text-muted);
+}
+
+.intro__engine {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* One column on phones, scanner beside the details from tablet up. */
+.demo {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+}
+
+@media (min-width: 900px) {
+    .demo {
+        grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.85fr);
+    }
+}
+
+.side {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Scanner
+   --------------------------------------------------------------------------- */
+.scanner {
+    position: relative;
+    background: #000;
+    /* Reserve some height so the layout does not jump before the stream arrives. */
+    min-height: 240px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* The video keeps its natural aspect ratio and simply fills the available width. */
+.scanner ::deep .zxing-container {
+    width: 100%;
+}
+
+.scanner ::deep video {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* With the component's own chrome on show, let it render as it normally would. */
+.scanner.has-builtin {
+    background: var(--surface);
+    min-height: 0;
+}
+
+.scanner.has-builtin ::deep .zxing-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 0.75rem;
+}
+
+.scanner.has-builtin ::deep .zxing-button {
+    min-height: 40px;
+    margin-right: 0.4rem;
+    padding: 0 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+}
+
+.scanner.has-builtin .scanner__reticle,
+.scanner.has-builtin .scanner__status {
+    display: none;
+}
+
+.scanner__reticle {
+    position: absolute;
+    inset: 14% 12%;
+    pointer-events: none;
+    opacity: 0.35;
+    transition: opacity 200ms ease;
+}
+
+.scanner.is-live .scanner__reticle {
+    opacity: 0.9;
+}
+
+.scanner__reticle span {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border: 3px solid #fff;
+}
+
+.scanner__reticle span:nth-child(1) {
+    top: 0;
+    left: 0;
+    border-right: 0;
+    border-bottom: 0;
+    border-top-left-radius: 10px;
+}
+
+.scanner__reticle span:nth-child(2) {
+    top: 0;
+    right: 0;
+    border-left: 0;
+    border-bottom: 0;
+    border-top-right-radius: 10px;
+}
+
+.scanner__reticle span:nth-child(3) {
+    bottom: 0;
+    right: 0;
+    border-left: 0;
+    border-top: 0;
+    border-bottom-right-radius: 10px;
+}
+
+.scanner__reticle span:nth-child(4) {
+    bottom: 0;
+    left: 0;
+    border-right: 0;
+    border-top: 0;
+    border-bottom-left-radius: 10px;
+}
+
+.scanner__status {
+    position: absolute;
+    top: 0.6rem;
+    left: 0.6rem;
+    z-index: 4;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    background: rgb(0 0 0 / 55%);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.scanner__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #9aa3af;
+}
+
+.scanner.is-live .scanner__dot {
+    background: #35d07f;
+    animation: pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    50% { opacity: 0.25; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .scanner.is-live .scanner__dot {
+        animation: none;
+    }
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border-top: 1px solid var(--border);
+}
+
+.actions .btn {
+    flex: 1 1 auto;
+}
+
+/* ---------------------------------------------------------------------------
+   Result
+   --------------------------------------------------------------------------- */
+.result {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.result__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.result__copy {
+    min-height: 34px;
+    font-size: 0.8rem;
+}
+
+.result__empty {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.result__value {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-size: clamp(1rem, 4vw, 1.3rem);
+    font-weight: 600;
+    line-height: 1.35;
+    word-break: break-all;
+    user-select: all;
+}
+
+.capture {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-top: 0.5rem;
+    border-radius: var(--radius-sm);
+}
+
+/* ---------------------------------------------------------------------------
+   Settings
+   --------------------------------------------------------------------------- */
+.settings__summary {
+    padding: 0.9rem 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.settings__summary::after {
+    content: "+";
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+.settings[open] .settings__summary::after {
+    content: "\2212";
+}
+
+.settings__summary::-webkit-details-marker {
+    display: none;
+}
+
+.settings__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    padding-top: 0;
+    border-top: 1px solid var(--border);
+    padding-block-start: 1rem;
+}
+
+.settings__rule {
+    width: 100%;
+    height: 1px;
+    margin: 0;
+    border: 0;
+    background: var(--border);
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}

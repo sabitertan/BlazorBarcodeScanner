@@ -2,106 +2,193 @@
 
 <PageTitle>BlazorBarcodeScanner Demo</PageTitle>
 
-<div class="container-fluid">
-    <div class="row">
-        <h2>BlazorBarcodeScanner Demo</h2>
+<div class="intro">
+    <h1 class="intro__title">Barcode scanner demo</h1>
+    <p class="intro__text">
+        The same component surface, backed by two interchangeable readers. Pick one and point
+        your camera at a barcode.
+    </p>
+
+    <div class="segmented" role="group" aria-label="Barcode reader engine">
+        @foreach (var engine in Engines)
+        {
+            <button type="button"
+                    aria-pressed="@(Engine == engine)"
+                    @onclick="() => SwitchEngine(engine)">
+                @EngineName(engine)
+            </button>
+        }
     </div>
-    <div class="row mb-3">
-        <div class="col">
-            <div class="btn-group" role="group" aria-label="Barcode reader implementation">
-                @foreach (var engine in Engines)
-                {
-                    <button type="button"
-                            class="btn @(Engine == engine ? "btn-primary" : "btn-outline-primary")"
-                            @onclick="() => SwitchEngine(engine)">
-                        @EngineName(engine)
-                    </button>
-                }
-            </div>
-            <div class="form-text">@EngineDescription(Engine)</div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm">
+    <p class="intro__engine">@EngineDescription(Engine)</p>
+</div>
+
+<div class="demo">
+    <section class="panel scanner-panel">
+        <div class="scanner @(IsScanning ? "is-live" : null) @(ShowBuiltInUi ? "has-builtin" : null)">
             @if (Engine == ScannerEngine.ZXingJs)
             {
                 <BlazorBarcodeScanner.ZXing.JS.BarcodeReader @ref="_jsReader"
                                                             @key="ScannerEngine.ZXingJs"
                                                             StartCameraAutomatically="true"
-                                                            Title="zxing-js"
-                                                            VideoWidth="720"
-                                                            VideoHeight="540"
+                                                            FullWidthVideo="true"
+                                                            Title=""
+                                                            ShowStart="ShowBuiltInUi"
+                                                            ShowStop="ShowBuiltInUi"
+                                                            ShowReset="ShowBuiltInUi"
+                                                            ShowToggleTorch="ShowBuiltInUi"
+                                                            ShowResult="ShowBuiltInUi"
+                                                            ShowVideoDeviceList="ShowBuiltInUi"
                                                             StreamWidth="@StreamWidth"
                                                             StreamHeight="@StreamHeight"
                                                             OnBarcodeReceived="LocalReceivedBarcodeText"
-                                                            OnErrorReceived="LocalReceivedError" />
+                                                            OnErrorReceived="LocalReceivedError"
+                                                            OnDecodingChanged="LocalDecodingChanged" />
             }
             else
             {
                 <BlazorBarcodeScanner.ZXing.Cpp.BarcodeReader @ref="_cppReader"
                                                              @key="ScannerEngine.ZXingCpp"
                                                              StartCameraAutomatically="true"
-                                                             Title="zxing-cpp (WebAssembly)"
-                                                             VideoWidth="720"
-                                                             VideoHeight="540"
+                                                             FullWidthVideo="true"
+                                                             Title=""
+                                                             ShowStart="ShowBuiltInUi"
+                                                             ShowStop="ShowBuiltInUi"
+                                                             ShowReset="ShowBuiltInUi"
+                                                             ShowToggleTorch="ShowBuiltInUi"
+                                                             ShowResult="ShowBuiltInUi"
+                                                             ShowVideoDeviceList="ShowBuiltInUi"
                                                              StreamWidth="@StreamWidth"
                                                              StreamHeight="@StreamHeight"
+                                                             Formats="@Formats"
+                                                             TryHarder="@TryHarder"
+                                                             ScanIntervalMilliseconds="@ScanInterval"
                                                              OnBarcodeReceived="LocalReceivedBarcodeText"
-                                                             OnErrorReceived="LocalReceivedError" />
+                                                             OnErrorReceived="LocalReceivedError"
+                                                             OnDecodingChanged="LocalDecodingChanged" />
             }
-        </div>
-        <div class="col-sm">
-            <div>
-                <b>Stream Resolution</b>
-                <div>(stop and start the stream to pickup new resolution)</div>
-                <div>
-                    <label>
-                        Width:
-                        <input style="width: 7em" @bind="StreamWidth" />
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        Height:
-                        <input style="width: 7em" @bind="StreamHeight" />
-                    </label>
-                </div>
-                <button @onclick="UpdateResolution" class="btn btn-outline-primary">Update stream</button>
-            </div>
-            <div class="mt-1">
-                <div><b>Custom Result</b></div>
-                <div class="alert alert-success" style="word-break: break-all;" role="alert">@(!string.IsNullOrWhiteSpace(LocalBarcodeText) ? @LocalBarcodeText : "Results will be here")</div>
-            </div>
-            <div class="mt-1">
-                <div><b>Errors</b></div>
-                <div class="alert alert-danger" style="word-break: break-all;" role="alert">@(!string.IsNullOrWhiteSpace(_lastError) ? _lastError : "Errors will be here")</div>
-            </div>
-            <div class="mt-1">
-                <b>Custom Controls</b>
-                <div>
-                    <button @onclick="StartDecoding" class="btn btn-outline-primary">Start</button>
-                    <button @onclick="StopDecoding" class="btn btn-outline-danger">Stop</button>
-                    <button @onclick="ToggleTorch" class="btn btn-outline-warning">Toggle Torch</button>
-                    <button @onclick="TorchOn" class="btn btn-outline-secondary">Torch On</button>
-                    <button @onclick="TorchOff" class="btn btn-outline-danger">Torch Off</button>
-                </div>
+
+            <div class="scanner__reticle" aria-hidden="true">
+                <span></span><span></span><span></span><span></span>
             </div>
 
-            <div class="mt-1">
-                <b>Custom Source Switch</b>
-                <div>
-                    <button @onclick="OnVideoSourceNext" class="btn btn-outline-dark">Next source</button>
-                </div>
-            </div>
-            <div class="mt-1">
-                <div>
-                    <button @onclick="CapturePicture" class="btn btn-outline-primary">Capture</button>
-                </div>
-                <div style="max-width:1024px">
-                    <img src="@_imgSrc" style="width:100%;height:auto;@(string.IsNullOrWhiteSpace(_imgSrc) ? "display:none;" : "")" />
-                </div>
+            <div class="scanner__status">
+                <span class="scanner__dot"></span>
+                @(IsScanning ? "Scanning" : "Camera off")
             </div>
         </div>
-    </div>
 
+        <div class="actions">
+            <button class="btn btn--primary" @onclick="ToggleScanning">
+                @(IsScanning ? "Stop" : "Start")
+            </button>
+            <button class="btn" @onclick="ToggleTorch" disabled="@(!IsScanning)">Torch</button>
+            <button class="btn" @onclick="OnVideoSourceNext" disabled="@(VideoInputCount < 2)">Flip camera</button>
+            <button class="btn" @onclick="CapturePicture" disabled="@(!IsScanning)">Capture</button>
+        </div>
+    </section>
+
+    <aside class="side">
+        <section class="panel">
+            <div class="panel__body result">
+                <div class="result__head">
+                    <span class="panel__title">Last result</span>
+                    @if (!string.IsNullOrWhiteSpace(LocalBarcodeText))
+                    {
+                        <button class="btn btn--ghost btn--icon result__copy" @onclick="CopyResult">
+                            @(_copied ? "Copied" : "Copy")
+                        </button>
+                    }
+                </div>
+
+                @if (string.IsNullOrWhiteSpace(LocalBarcodeText))
+                {
+                    <p class="result__empty">Nothing scanned yet.</p>
+                }
+                else
+                {
+                    <output class="result__value">@LocalBarcodeText</output>
+                }
+            </div>
+        </section>
+
+        @if (!string.IsNullOrWhiteSpace(_lastError))
+        {
+            <div class="alert" role="alert">@_lastError</div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(_imgSrc))
+        {
+            <section class="panel">
+                <div class="panel__body">
+                    <div class="result__head">
+                        <span class="panel__title">Captured frame</span>
+                        <button class="btn btn--ghost btn--icon" @onclick="() => _imgSrc = string.Empty">Clear</button>
+                    </div>
+                    <img class="capture" src="@_imgSrc" alt="Captured video frame" />
+                </div>
+            </section>
+        }
+
+        <details class="panel settings">
+            <summary class="settings__summary">Settings</summary>
+            <div class="panel__body settings__body">
+                @if (VideoInputCount > 0)
+                {
+                    <div class="field">
+                        <label for="camera">Camera</label>
+                        <select id="camera" value="@SelectedVideoInputId" @onchange="OnCameraChanged">
+                            @foreach (var device in VideoInputDeviceList)
+                            {
+                                <option value="@device.Id">@device.Label</option>
+                            }
+                        </select>
+                    </div>
+                }
+
+                <div class="grid-2">
+                    <div class="field">
+                        <label for="stream-width">Stream width</label>
+                        <input id="stream-width" type="number" inputmode="numeric" @bind="StreamWidth" />
+                    </div>
+                    <div class="field">
+                        <label for="stream-height">Stream height</label>
+                        <input id="stream-height" type="number" inputmode="numeric" @bind="StreamHeight" />
+                    </div>
+                </div>
+                <button class="btn" @onclick="UpdateResolution">Apply resolution</button>
+
+                @if (Engine == ScannerEngine.ZXingCpp)
+                {
+                    <hr class="settings__rule" />
+
+                    <div class="field">
+                        <label for="formats">Formats</label>
+                        <select id="formats" @bind="Formats">
+                            @foreach (var format in FormatChoices)
+                            {
+                                <option value="@format.Value">@format.Label</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="interval">Scan interval &mdash; @ScanInterval ms</label>
+                        <input id="interval" type="range" min="0" max="500" step="25" @bind="ScanInterval" @bind:event="oninput" />
+                    </div>
+
+                    <div class="field field--inline">
+                        <input id="try-harder" type="checkbox" @bind="TryHarder" />
+                        <label for="try-harder">Try harder</label>
+                    </div>
+                }
+
+                <hr class="settings__rule" />
+
+                <div class="field field--inline">
+                    <input id="builtin" type="checkbox" @bind="ShowBuiltInUi" />
+                    <label for="builtin">Show the component's built-in controls</label>
+                </div>
+            </div>
+        </details>
+    </aside>
 </div>

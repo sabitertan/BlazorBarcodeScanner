@@ -1,77 +1,64 @@
-.page {
-    position: relative;
+.shell {
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
 }
 
-main {
-    flex: 1;
+.appbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: color-mix(in srgb, var(--surface) 85%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
 }
 
-.sidebar {
-    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
-}
-
-.top-row {
-    background-color: #f7f7f7;
-    border-bottom: 1px solid #d6d5d5;
-    justify-content: flex-end;
-    height: 3.5rem;
+.appbar__inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0.7rem 1rem;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
 }
 
-    .top-row ::deep a, .top-row ::deep .btn-link {
-        white-space: nowrap;
-        margin-left: 1.5rem;
-        text-decoration: none;
-    }
-
-    .top-row ::deep a:hover, .top-row ::deep .btn-link:hover {
-        text-decoration: underline;
-    }
-
-    .top-row ::deep a:first-child {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-@media (max-width: 640.98px) {
-    .top-row {
-        justify-content: space-between;
-    }
-
-    .top-row ::deep a, .top-row ::deep .btn-link {
-        margin-left: 0;
-    }
+.appbar__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
 }
 
-@media (min-width: 641px) {
-    .page {
-        flex-direction: row;
-    }
+.appbar__mark {
+    width: 18px;
+    height: 18px;
+    /* Stylised barcode. */
+    background-image: linear-gradient(90deg, var(--accent) 0 2px, transparent 2px 4px, var(--accent) 4px 5px, transparent 5px 8px, var(--accent) 8px 11px, transparent 11px 13px, var(--accent) 13px 14px, transparent 14px 16px, var(--accent) 16px 18px);
+}
 
-    .sidebar {
-        width: 250px;
-        height: 100vh;
-        position: sticky;
-        top: 0;
-    }
+.appbar__link {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 550;
+    text-decoration: none;
+}
 
-    .top-row {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-    }
+.appbar__link:hover {
+    color: var(--text);
+}
 
-    .top-row.auth ::deep a:first-child {
-        flex: 1;
-        text-align: right;
-        width: 0;
-    }
+.shell__body {
+    flex: 1;
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 1rem 1rem 2.5rem;
+}
 
-    .top-row, article {
-        padding-left: 2rem !important;
-        padding-right: 1.5rem !important;
+@media (max-width: 480px) {
+    .appbar__brand {
+        font-size: 0.95rem;
     }
 }
