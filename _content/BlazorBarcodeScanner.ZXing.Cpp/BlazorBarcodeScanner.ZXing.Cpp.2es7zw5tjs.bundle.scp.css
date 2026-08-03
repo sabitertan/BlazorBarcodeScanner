@@ -1,0 +1,32 @@
+/* _content/BlazorBarcodeScanner.ZXing.Cpp/BarcodeReader.razor.rz.scp.css */
+/* The overlay canvas has to sit exactly on top of the video for the detection
+   outline drawn by zxing-cpp to line up with what the user sees. */
+.zxing-video-container[b-a8hgeorz1t] {
+    position: relative;
+    display: inline-block;
+    line-height: 0;
+}
+
+.zxing-video-container.full-width[b-a8hgeorz1t] {
+    display: block;
+    width: 100%;
+}
+
+.zxing-video[b-a8hgeorz1t] {
+    display: block;
+    max-width: 100%;
+}
+
+.zxing-video-container.full-width .zxing-video[b-a8hgeorz1t] {
+    width: 100%;
+    height: auto;
+}
+
+.zxing-overlay[b-a8hgeorz1t] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
