@@ -27,7 +27,13 @@
         <a class="dismiss">🗙</a>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
-    <script src="_content/BlazorBarcodeScanner.ZXing.Cpp/zxing.js"></script>
+
+    <!-- zxing-js based reader -->
+    <script src="_content/BlazorBarcodeScanner.ZXing.JS/zxingjs.index.min.js"></script>
+    <script src="_content/BlazorBarcodeScanner.ZXing.JS/BlazorBarcodeScanner.js"></script>
+
+    <!-- zxing-cpp (WebAssembly) based reader -->
+    <script src="_content/BlazorBarcodeScanner.ZXing.Cpp/zxing-cpp.js"></script>
     <script src="_content/BlazorBarcodeScanner.ZXing.Cpp/BlazorBarcodeScanner.js"></script>
 </body>
 

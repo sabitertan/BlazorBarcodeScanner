@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>BlazorBarcodeScanner.Tests</RootNamespace>
+    <!-- xunit v3 test projects are self-executing. -->
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="bunit" Version="2.9.*" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.*" />
+    <PackageReference Include="xunit.v3" Version="3.2.*" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BlazorBarcodeScanner.ZXing.JS\BlazorBarcodeScanner.ZXing.JS.csproj" />
+    <ProjectReference Include="..\BlazorBarcodeScanner.Zxing.Cpp\BlazorBarcodeScanner.ZXing.Cpp.csproj" />
+  </ItemGroup>
+
+</Project>

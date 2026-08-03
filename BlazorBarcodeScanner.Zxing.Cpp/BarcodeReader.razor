@@ -1,4 +1,4 @@
-﻿@using Microsoft.JSInterop
+@using Microsoft.JSInterop
 
 <section class="zxing-container">
     @if (!string.IsNullOrWhiteSpace(Title))
@@ -42,21 +42,17 @@
         </div>
     }
 
-    <div class="zxing-video-container">
-        <canvas id="video-canvas" width="@VideoWidth" height="@VideoHeight"> 
+    <div class="zxing-video-container @(FullWidthVideo ? "full-width" : null)">
         @if (FullWidthVideo)
         {
-            <video @ref="_video"></video>
-        } else
-        {
-            <video @ref="_video" width="@VideoWidth" height="@VideoHeight"></video>
+            <video @ref="_video" class="zxing-video" playsinline muted></video>
         }
-        </canvas>
-
-        <div id="result"></div>
-
+        else
+        {
+            <video @ref="_video" class="zxing-video" width="@VideoWidth" height="@VideoHeight" playsinline muted></video>
+        }
+        <canvas @ref="_overlay" class="zxing-overlay"></canvas>
     </div>
-    <canvas @ref="_canvas" style="display:none;" id="capture"/>
 
     @if (ShowVideoDeviceList)
     {
@@ -88,5 +84,5 @@
             <div class="zxing-result" style="word-break: break-all;">@BarcodeText</div>
         </div>
     }
-    
+
 </section>

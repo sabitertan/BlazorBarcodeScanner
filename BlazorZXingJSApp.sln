@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorBarcodescanner.Base",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorBarcodeScannerWasmStandalone", "BlazorBarcodeScannerWasmStandalone\BlazorBarcodeScannerWasmStandalone.csproj", "{20C4AF4F-5C10-4806-AE47-6C23990648A1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorBarcodeScanner.Tests", "BlazorBarcodeScanner.Tests\BlazorBarcodeScanner.Tests.csproj", "{3D48909F-BC4C-425E-8A8F-30D53CD72CF0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{20C4AF4F-5C10-4806-AE47-6C23990648A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20C4AF4F-5C10-4806-AE47-6C23990648A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20C4AF4F-5C10-4806-AE47-6C23990648A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D48909F-BC4C-425E-8A8F-30D53CD72CF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D48909F-BC4C-425E-8A8F-30D53CD72CF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D48909F-BC4C-425E-8A8F-30D53CD72CF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D48909F-BC4C-425E-8A8F-30D53CD72CF0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

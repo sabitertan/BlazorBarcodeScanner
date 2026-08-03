@@ -1,5 +1,5 @@
 
-var ZXing = (() => {
+var ZXingCpp = (() => {
   var _scriptDir = typeof document !== 'undefined' && document.currentScript ? document.currentScript.src : undefined;
   
   return (
@@ -14,6 +14,6 @@ var Module=moduleArg;var readyPromiseResolve,readyPromiseReject;Module["ready"]=
 })();
 ;
 if (typeof exports === 'object' && typeof module === 'object')
-  module.exports = ZXing;
+  module.exports = ZXingCpp;
 else if (typeof define === 'function' && define['amd'])
-  define([], () => ZXing);
+  define([], () => ZXingCpp);

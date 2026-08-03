@@ -78,7 +78,7 @@ namespace BlazorBarcodeScanner.ZXing.JS
         public EventCallback<DecodingChangedArgs> OnDecodingChanged { get; set; }
 
         private bool _isDecoding = false;
-        private DotNetObjectReference<BarcodeReaderInterop>? dotNetHelper;
+        private DotNetObjectReference<BarcodeReaderInterop> dotNetHelper;
         public bool IsDecoding
         {
             get => _isDecoding;
@@ -174,7 +174,8 @@ namespace BlazorBarcodeScanner.ZXing.JS
         [Obsolete("Please use DisposeAsync")]
         public void Dispose()
         {
-            DisposeAsync();
+            /* Nothing sensible to await on here - blocking would risk deadlocking the renderer. */
+            _ = DisposeAsync();
         }
         public async ValueTask DisposeAsync()
         {
@@ -198,6 +199,10 @@ namespace BlazorBarcodeScanner.ZXing.JS
         {
             _videoInputDevices = await _backend.GetVideoInputDevices("get");
             await VideoInputDevicesChanged.InvokeAsync(_videoInputDevices);
+
+            /* Blazor does not re-render on its own once OnAfterRenderAsync completes, so the
+             * freshly discovered cameras would otherwise never reach the markup. */
+            StateHasChanged();
         }
 
         protected async Task RestartDecoding()

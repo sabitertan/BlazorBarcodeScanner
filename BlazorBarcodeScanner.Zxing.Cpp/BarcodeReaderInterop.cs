@@ -4,41 +4,60 @@ using Microsoft.JSInterop;
 
 namespace BlazorBarcodeScanner.ZXing.Cpp
 {
-    internal class BarcodeReaderInterop
+    /// <summary>
+    /// Wraps the zxing-cpp WebAssembly reader. Every instance owns its own JS scanner
+    /// object, so multiple <see cref="BarcodeReader"/> components can live on one page.
+    /// </summary>
+    internal sealed class BarcodeReaderInterop : IAsyncDisposable
     {
-        private readonly IJSRuntime jSRuntime;
+        private const string JsNamespace = "BlazorBarcodeScannerZXingCpp";
 
-        public BarcodeReaderInterop(IJSRuntime runtime)
+        private readonly IJSRuntime _jsRuntime;
+        private DotNetObjectReference<BarcodeReaderInterop>? _selfReference;
+        private IJSObjectReference? _reader;
+        private string _lastCode = string.Empty;
+
+        public BarcodeReaderInterop(IJSRuntime jsRuntime)
         {
-            jSRuntime = runtime;
+            _jsRuntime = jsRuntime;
         }
 
-        public ValueTask<List<VideoInputDevice>> GetVideoInputDevices(string message)
-        {
-            // Implemented in BlazorBarcodeScannerJsInterop.js
+        private IJSObjectReference Reader =>
+            _reader ?? throw new InvalidOperationException($"{nameof(BarcodeReaderInterop)} has not been initialized yet.");
 
-            return jSRuntime.InvokeAsync<List<VideoInputDevice>>(
-                "BlazorBarcodeScanner.listVideoInputDevices",
-                message);
+        public async Task InitializeAsync()
+        {
+            if (_reader is not null)
+            {
+                return;
+            }
+
+            _selfReference = DotNetObjectReference.Create(this);
+            _reader = await _jsRuntime.InvokeAsync<IJSObjectReference>($"{JsNamespace}.createReader", _selfReference);
         }
 
-        public async Task StartDecoding(ElementReference video, int width, int height)
+        public ValueTask<List<VideoInputDevice>> GetVideoInputDevices()
+        {
+            return _jsRuntime.InvokeAsync<List<VideoInputDevice>>($"{JsNamespace}.listVideoInputDevices");
+        }
+
+        public async Task StartDecoding(ElementReference video, ElementReference overlay, int width, int height)
         {
             await SetVideoResolution(width, height);
-            await StartDecoding(video);
+            await StartDecoding(video, overlay);
         }
 
-        public async Task StartDecoding(ElementReference video)
+        public async Task StartDecoding(ElementReference video, ElementReference overlay)
         {
             try
             {
-                await jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.startDecoding", video);
+                await Reader.InvokeVoidAsync("startDecoding", video, overlay);
             }
             catch (JSException e)
             {
-                if (e.Message.IndexOf("Permission denied") > -1 || e.Message.IndexOf("The request is not allowed by the user agent") > -1 )
+                if (e.Message.IndexOf("Permission denied") > -1 || e.Message.IndexOf("The request is not allowed by the user agent") > -1)
                 {
-                    OnErrorReceived(new Exception(message: "Camera acces is blocked. Please give access to camera for using barcode scanner."));
+                    await RaiseError("Camera access is blocked. Please give access to the camera to use the barcode scanner.");
                 }
                 else
                 {
@@ -49,178 +68,186 @@ namespace BlazorBarcodeScanner.ZXing.Cpp
 
         public async Task StopDecoding()
         {
-            await  jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.stopDecoding");
+            /* Forget the previous hit so scanning the same code again after a restart still raises the event. */
+            _lastCode = string.Empty;
+            await Reader.InvokeVoidAsync("stopDecoding");
         }
 
         public async Task SetVideoInputDevice(string deviceId)
         {
-            await  jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setSelectedDeviceId", deviceId);
+            await Reader.InvokeVoidAsync("setSelectedDeviceId", deviceId);
         }
 
         public async Task<string> GetVideoInputDevice()
         {
-            return await jSRuntime.InvokeAsync<string>("BlazorBarcodeScanner.getSelectedDeviceId");
+            return await Reader.InvokeAsync<string>("getSelectedDeviceId");
         }
 
         public async Task SetVideoResolution(int width, int height)
         {
-            await  jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setVideoResolution", width, height);
+            await Reader.InvokeVoidAsync("setVideoResolution", width, height);
+        }
+
+        /// <param name="formats">
+        /// Pipe separated zxing-cpp format names, for example <c>QRCode|EAN-13</c>.
+        /// An empty string enables every supported format.
+        /// </param>
+        /// <param name="tryHarder">Spend more time per frame to find codes that are rotated, blurry or low contrast.</param>
+        /// <param name="scanIntervalMilliseconds">Minimum time between two decode attempts.</param>
+        public async Task SetDecodeOptions(string formats, bool tryHarder, int scanIntervalMilliseconds)
+        {
+            await Reader.InvokeVoidAsync("setDecodeOptions", formats, tryHarder, scanIntervalMilliseconds);
         }
 
         public async Task SetTorchOn()
         {
-            await  jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setTorchOn");
+            await Reader.InvokeVoidAsync("setTorchOn");
         }
 
         public async Task SetTorchOff()
         {
-            await jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setTorchOff");
+            await Reader.InvokeVoidAsync("setTorchOff");
         }
 
         public async Task ToggleTorch()
         {
-            await jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.toggleTorch");
+            await Reader.InvokeVoidAsync("toggleTorch");
         }
 
-        public async Task<string> Capture(ElementReference canvas)
+        public async Task<string> Capture()
         {
-            await jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.capture", "image/jpeg", canvas);
-            return await PictureGet("capture");
+            return await Reader.InvokeAsync<string>("capture", "image/jpeg");
         }
 
-        internal async Task SetLastDecodedPictureFormat(string format)
+        public async Task SetLastDecodedPictureFormat(string? format)
         {
-            await jSRuntime.InvokeVoidAsync("BlazorBarcodeScanner.setLastDecodedPictureFormat", format);
+            await Reader.InvokeVoidAsync("setLastDecodedPictureFormat", format);
         }
 
         public async Task<string> GetLastDecodedPicture()
         {
-            return await PictureGet("decoded");
+            return await Reader.InvokeAsync<string>("pictureGetBase64", "decoded");
         }
 
-        private async Task<string> PictureGet(string source)
-        {
-
-            /* 
- * Due to the size of the expected images, on .NET Core 5.0.5 it proved beneficial to 
- * transfer the string unmarshalled rather than having it packed through the standard 
- * mechanisms. Brief benchmarks on a recent PC over three FullHD snapshots in a row 
- * yielded following results (in milliseconds):
- * 
- *  Edge 90.0.818.42:
- *      Capturing:                  309     217     336     389
- *      Transfer:   Marshalled      600     534     638     618
- *                  Unmarshalled      9        3     10       4
- *
- *  Chrome 90.0.4430.85:
- *      Capturing:                  334     231     338     233
- *      Transfer:   Marshalled      571     453     466     451
- *                  Unmarshalled     11       5      11       2
- *                  
- * As a consequence we try to use the unmarshalled path as often as possible.
- */
-            string result = await PictureGetMarshalled(source);
-
-            return result;
-        }
-
-        private async Task<string> PictureGetMarshalled(string source)
-        {
-            return await jSRuntime.InvokeAsync<string>("BlazorBarcodeScanner.pictureGetBase64", source);
-        }
-
-        private string lastCode = string.Empty;
         [JSInvokable]
-        public  void OnBarcodeReceived(string barcodeText)
+        public async Task OnBarcodeReceived(string barcodeText)
         {
             if (string.IsNullOrEmpty(barcodeText))
             {
                 return;
             }
+
             /* Debounce code */
-            if (barcodeText == lastCode)
+            if (barcodeText == _lastCode)
             {
                 return;
             }
-            lastCode = barcodeText;
-            BarcodeReceivedEventArgs args = new BarcodeReceivedEventArgs()
+            _lastCode = barcodeText;
+
+            var args = new BarcodeReceivedEventArgs
             {
                 BarcodeText = barcodeText,
                 TimeReceived = DateTime.Now,
             };
 
-            BarcodeReceived?.Invoke(args);
+            await Raise(BarcodeReceived, args);
         }
+
         [JSInvokable]
-        public  void OnErrorReceived(Exception exception)
+        public async Task OnErrorReceived(string message)
         {
-            if (string.IsNullOrEmpty(exception.Message))
-            {
-                return;
-            }
-
-            ErrorReceivedEventArgs args = new ErrorReceivedEventArgs()
-            {
-                Message = exception.Message
-            };
-
-            ErrorReceived?.Invoke(args);
+            await RaiseError(message);
         }
+
         [JSInvokable]
         public void OnNotFoundReceived()
         {
-            if (!string.IsNullOrEmpty(lastCode))
-            {
-                lastCode = string.Empty;
-                BarcodeNotFound?.Invoke();
-            }
-        }
-        [JSInvokable]
-        public  void OnDecodingStarted(string deviceId)
-        {
-            if (string.IsNullOrEmpty(deviceId))
+            if (_lastCode.Length == 0)
             {
                 return;
             }
 
-            DecodingActionEventArgs args = new DecodingActionEventArgs()
-            {
-                DeviceId = deviceId
-            };
-
-            DecodingStarted?.Invoke(args);
+            _lastCode = string.Empty;
+            BarcodeNotFound?.Invoke();
         }
+
         [JSInvokable]
-        public  void OnDecodingStopped(string deviceId)
+        public async Task OnDecodingStarted(string deviceId)
         {
-            if (string.IsNullOrEmpty(deviceId))
+            await Raise(DecodingStarted, new DecodingActionEventArgs { DeviceId = deviceId });
+        }
+
+        [JSInvokable]
+        public async Task OnDecodingStopped(string deviceId)
+        {
+            await Raise(DecodingStopped, new DecodingActionEventArgs { DeviceId = deviceId });
+        }
+
+        internal async Task RaiseError(string message)
+        {
+            if (string.IsNullOrEmpty(message))
             {
                 return;
             }
 
-            DecodingActionEventArgs args = new DecodingActionEventArgs()
-            {
-                DeviceId = deviceId
-            };
-
-            DecodingStopped?.Invoke(args);
+            await Raise(ErrorReceived, new ErrorReceivedEventArgs { Message = message });
         }
 
-        public  event BarcodeReceivedEventHandler BarcodeReceived;
-        public  event ErrorReceivedEventHandler ErrorReceived;
+        private static Task Raise(BarcodeReceivedEventHandler? handler, BarcodeReceivedEventArgs args) =>
+            handler is null ? Task.CompletedTask : Task.WhenAll(handler.GetInvocationList().Cast<BarcodeReceivedEventHandler>().Select(h => h(args)));
 
-        public  event DecodingStartedEventHandler DecodingStarted;
-        public  event DecodingStoppedEventHandler DecodingStopped;
+        private static Task Raise(ErrorReceivedEventHandler? handler, ErrorReceivedEventArgs args) =>
+            handler is null ? Task.CompletedTask : Task.WhenAll(handler.GetInvocationList().Cast<ErrorReceivedEventHandler>().Select(h => h(args)));
 
-        public  event Action BarcodeNotFound;
+        private static Task Raise(DecodingStartedEventHandler? handler, DecodingActionEventArgs args) =>
+            handler is null ? Task.CompletedTask : Task.WhenAll(handler.GetInvocationList().Cast<DecodingStartedEventHandler>().Select(h => h(args)));
+
+        private static Task Raise(DecodingStoppedEventHandler? handler, DecodingActionEventArgs args) =>
+            handler is null ? Task.CompletedTask : Task.WhenAll(handler.GetInvocationList().Cast<DecodingStoppedEventHandler>().Select(h => h(args)));
+
+        public async ValueTask DisposeAsync()
+        {
+            if (_reader is not null)
+            {
+                try
+                {
+                    await _reader.InvokeVoidAsync("dispose");
+                    await _reader.DisposeAsync();
+                }
+                catch (JSDisconnectedException)
+                {
+                    /* The browser is already gone - nothing left to clean up. */
+                }
+                catch (ObjectDisposedException)
+                {
+                }
+
+                _reader = null;
+            }
+
+            _selfReference?.Dispose();
+            _selfReference = null;
+        }
+
+        public event BarcodeReceivedEventHandler? BarcodeReceived;
+        public event ErrorReceivedEventHandler? ErrorReceived;
+
+        public event DecodingStartedEventHandler? DecodingStarted;
+        public event DecodingStoppedEventHandler? DecodingStopped;
+
+        public event Action? BarcodeNotFound;
     }
-    public class ErrorReceivedEventArgs : EventArgs { 
-        public string Message { get; set; }
+
+    public class ErrorReceivedEventArgs : EventArgs
+    {
+        public string Message { get; set; } = string.Empty;
     }
+
     public delegate Task ErrorReceivedEventHandler(ErrorReceivedEventArgs args);
+
     public class BarcodeReceivedEventArgs : EventArgs
     {
-        public string BarcodeText { get; set; }
+        public string BarcodeText { get; set; } = string.Empty;
         public DateTime TimeReceived { get; set; } = new DateTime();
     }
 
@@ -228,23 +255,18 @@ namespace BlazorBarcodeScanner.ZXing.Cpp
 
     public class DecodingActionEventArgs : EventArgs
     {
-        public string DeviceId { get; set; }
+        public string DeviceId { get; set; } = string.Empty;
     }
+
     public delegate Task DecodingStartedEventHandler(DecodingActionEventArgs args);
 
-    public class DecodingStoppedEventArgs : EventArgs
-    {
-        public string DeviceId { get; set; }
-    }
     public delegate Task DecodingStoppedEventHandler(DecodingActionEventArgs args);
-
 
     public class VideoInputDevice
     {
-        public string DeviceId { get; set; }
-        public string GroupId { get; set; }
-        public string Kind { get; set; }
-        public string Label { get; set; }
-
+        public string DeviceId { get; set; } = string.Empty;
+        public string GroupId { get; set; } = string.Empty;
+        public string Kind { get; set; } = string.Empty;
+        public string Label { get; set; } = string.Empty;
     }
 }

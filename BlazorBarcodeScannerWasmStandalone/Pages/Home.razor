@@ -1,20 +1,54 @@
-﻿@page "/"
+@page "/"
+
+<PageTitle>BlazorBarcodeScanner Demo</PageTitle>
 
 <div class="container-fluid">
     <div class="row">
         <h2>BlazorBarcodeScanner Demo</h2>
     </div>
+    <div class="row mb-3">
+        <div class="col">
+            <div class="btn-group" role="group" aria-label="Barcode reader implementation">
+                @foreach (var engine in Engines)
+                {
+                    <button type="button"
+                            class="btn @(Engine == engine ? "btn-primary" : "btn-outline-primary")"
+                            @onclick="() => SwitchEngine(engine)">
+                        @EngineName(engine)
+                    </button>
+                }
+            </div>
+            <div class="form-text">@EngineDescription(Engine)</div>
+        </div>
+    </div>
     <div class="row">
         <div class="col-sm">
-            <BlazorBarcodeScanner.ZXing.Cpp.BarcodeReader @ref="_reader"
-                                                         StartCameraAutomatically="true"
-                                                         Title="Scanzor"
-                                                         VideoWidth="720"
-                                                         VideoHeight="540"
-                                                         StreamWidth="@StreamWidth"
-                                                         StreamHeight="@StreamHeight"
-                                                         OnBarcodeReceived="LocalReceivedBarcodeText"
-                                                         OnErrorReceived="LocalReceivedError" />
+            @if (Engine == ScannerEngine.ZXingJs)
+            {
+                <BlazorBarcodeScanner.ZXing.JS.BarcodeReader @ref="_jsReader"
+                                                            @key="ScannerEngine.ZXingJs"
+                                                            StartCameraAutomatically="true"
+                                                            Title="zxing-js"
+                                                            VideoWidth="720"
+                                                            VideoHeight="540"
+                                                            StreamWidth="@StreamWidth"
+                                                            StreamHeight="@StreamHeight"
+                                                            OnBarcodeReceived="LocalReceivedBarcodeText"
+                                                            OnErrorReceived="LocalReceivedError" />
+            }
+            else
+            {
+                <BlazorBarcodeScanner.ZXing.Cpp.BarcodeReader @ref="_cppReader"
+                                                             @key="ScannerEngine.ZXingCpp"
+                                                             StartCameraAutomatically="true"
+                                                             Title="zxing-cpp (WebAssembly)"
+                                                             VideoWidth="720"
+                                                             VideoHeight="540"
+                                                             StreamWidth="@StreamWidth"
+                                                             StreamHeight="@StreamHeight"
+                                                             OnBarcodeReceived="LocalReceivedBarcodeText"
+                                                             OnErrorReceived="LocalReceivedError" />
+            }
         </div>
         <div class="col-sm">
             <div>
@@ -32,7 +66,7 @@
                         <input style="width: 7em" @bind="StreamHeight" />
                     </label>
                 </div>
-                <button @onclick="() => _reader.UpdateResolution()" class="btn btn-outline-primary">Update stream</button>
+                <button @onclick="UpdateResolution" class="btn btn-outline-primary">Update stream</button>
             </div>
             <div class="mt-1">
                 <div><b>Custom Result</b></div>
@@ -45,11 +79,11 @@
             <div class="mt-1">
                 <b>Custom Controls</b>
                 <div>
-                    <button @onclick="() => _reader.StartDecoding()" class="btn btn-outline-primary">Start</button>
-                    <button @onclick="() => _reader.StopDecoding()" class="btn btn-outline-danger">Stop</button>
-                    <button @onclick="() => _reader.ToggleTorch()" class="btn btn-outline-warning">Toggle Torch</button>
-                    <button @onclick="() => _reader.TorchOn()" class="btn btn-outline-secondary">Torch On</button>
-                    <button @onclick="() => _reader.TorchOff()" class="btn btn-outline-danger">Torch Off</button>
+                    <button @onclick="StartDecoding" class="btn btn-outline-primary">Start</button>
+                    <button @onclick="StopDecoding" class="btn btn-outline-danger">Stop</button>
+                    <button @onclick="ToggleTorch" class="btn btn-outline-warning">Toggle Torch</button>
+                    <button @onclick="TorchOn" class="btn btn-outline-secondary">Torch On</button>
+                    <button @onclick="TorchOff" class="btn btn-outline-danger">Torch Off</button>
                 </div>
             </div>
 

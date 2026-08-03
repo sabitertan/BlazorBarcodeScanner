@@ -1,379 +1,410 @@
-console.log("Init BlazorBarcodeScanner");
-
-class Helpers {
-    static dotNetHelper;
-
-    static setDotNetHelper(value) {
-        Helpers.dotNetHelper = value;
-    }
-
-    static async receiveBarcode(text) {
-        await Helpers.dotNetHelper.invokeMethodAsync('OnBarcodeReceived', text);
-    }
-
-    static async receiveError(err) {
-        await Helpers.dotNetHelper.invokeMethodAsync('OnErrorReceived', err);
-    }
-
-    static async receiveNotFound() {
-        await Helpers.dotNetHelper.invokeMethodAsync('OnNotFoundReceived');
-    }
-
-    static async decodingStarted(deviceId) {
-        await Helpers.dotNetHelper.invokeMethodAsync('OnDecodingStarted', deviceId);
-    }
-
-    static async decodingStopped(deviceId) {
-        await Helpers.dotNetHelper.invokeMethodAsync('OnDecodingStopped', deviceId);
-    }
-}
-
-window.Helpers = Helpers;
-
-async function mediaStreamSetTorch(track, onOff) {
-    await track.applyConstraints({
-        advanced: [{
-            fillLightMode: onOff ? 'flash' : 'off',
-            torch: !!onOff,
-        }],
-    });
-}
-
-/**
- * Checks if the stream has torch support.
- */
-function mediaStreamIsTorchCompatible(stream) {
-
-    const tracks = stream.getVideoTracks();
-
-    for (const track of tracks) {
-        if (mediaStreamIsTorchCompatibleTrack(track)) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-/**
- * Checks if the stream has torch support and return track has torch capability.
- */
-function mediaStreamGetTorchCompatibleTrack(stream) {
-
-    const tracks = stream.getVideoTracks();
-
-    for (const track of tracks) {
-        if (mediaStreamIsTorchCompatibleTrack(track)) {
-            return track;
-        }
-    }
-
-    return null;
-}
-
-/**
- *
- * @param track The media stream track that will be checked for compatibility.
- */
-function mediaStreamIsTorchCompatibleTrack(track) {
-    try {
-        const capabilities = track.getCapabilities();
-        return 'torch' in capabilities;
-    } catch (err) {
-        // some browsers may not be compatible with ImageCapture
-        // so we are ignoring this for now.
-        console.error(err);
-        console.warn('Your browser may be not fully compatible with WebRTC and/or ImageCapture specs. Torch will not be available.');
-        return false;
-    }
-}
-
-function initZxing(canvas, constraints, video, callbackFn){
-    var zxing = ZXing().then(function (instance) {
-        zxing = instance; // this line is supposedly not required but with current emsdk it is :-/
-    });
-
-    const cameraSelector = document.getElementById("cameraSelector");
-    const format = '';
-    const mode = 'true';
-    // const canvas = document.getElementById("video-canvas");
-    const resultElement = document.getElementById("result");
-
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
-    // const video = document.createElement("video");
-    //video.setAttribute("id", "video");
-    //video.setAttribute("width", canvas.width);
-    //video.setAttribute("height", canvas.height);
-    //video.setAttribute("autoplay", "");
-
-    function readBarcodeFromCanvas(canvas, format, mode) {
-        let imgWidth = canvas.width;
-        let imgHeight = canvas.height;
-        let imageData = canvas.getContext('2d').getImageData(0, 0, imgWidth, imgHeight);
-        let sourceBuffer = imageData.data;
-
-        if (zxing != null) {
-            let buffer = zxing._malloc(sourceBuffer.byteLength);
-            zxing.HEAPU8.set(sourceBuffer, buffer);
-            let result = zxing.readBarcodeFromPixmap(buffer, imgWidth, imgHeight, true, '');
-            zxing._free(buffer);
-            return result;
-        } else {
-            return { error: "ZXing not yet initialized" };
-        }
-    }
-
-    function drawResult(code) {
-        ctx.beginPath();
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = "red";
-        // ctx.textAlign = "center";
-        // ctx.fillStyle = "#green"
-        // ctx.font = "25px Arial";
-        // ctx.fontWeight = "bold";
-        with (code.position) {
-            ctx.moveTo(topLeft.x, topLeft.y);
-            ctx.lineTo(topRight.x, topRight.y);
-            ctx.lineTo(bottomRight.x, bottomRight.y);
-            ctx.lineTo(bottomLeft.x, bottomLeft.y);
-            ctx.lineTo(topLeft.x, topLeft.y);
-            ctx.stroke();
-            // ctx.fillText(code.text, (topLeft.x + bottomRight.x) / 2, (topLeft.y + bottomRight.y) / 2);
-        }
-    }
-
-    function escapeTags(htmlStr) {
-        return htmlStr.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-    }
-
-    const processFrame = function () {
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        const code = readBarcodeFromCanvas(canvas, format.value, mode.value === 'true');
-        if (code.format) {
-            resultElement.innerText = code.format + ": " + escapeTags(code.text);
-            drawResult(code)
-            callbackFn({text : escapeTags(code.text)});
-        } else {
-            resultElement.innerText = "No barcode found";
-        }
-        requestAnimationFrame(processFrame);
-    };
-
-    const updateVideoStream = function (deviceId) {
-        navigator.mediaDevices
-            .getUserMedia(constraints)
-            .then(function (stream) {
-                video.srcObject = stream;
-                video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
-                video.play();
-                processFrame();
-            })
-            .catch(function (error) {
-                console.error("Error accessing camera:", error);
-            });
-    };
 /*
-    cameraSelector.addEventListener("change", function () {
-        updateVideoStream(this.value);
-    });
-    */
+ * Blazor interop for the zxing-cpp WebAssembly reader.
+ *
+ * The global is deliberately named differently from the one exported by
+ * BlazorBarcodeScanner.ZXing.JS so both packages can be referenced by the same app.
+ */
+(function () {
+    "use strict";
 
-    updateVideoStream();
-    }
-const codeReader = {
-    stopStreams: function () {
-        if (this.stream) {
-            this.stream.getVideoTracks().forEach(t => t.stop());
-            this.stream = undefined;
+    let zxingPromise = null;
+
+    /** Instantiates the zxing-cpp WebAssembly module once and caches the promise. */
+    function getZXing() {
+        if (zxingPromise === null) {
+            if (typeof ZXingCpp !== "function") {
+                return Promise.reject(new Error(
+                    'zxing-cpp.js is not loaded. Add <script src="_content/BlazorBarcodeScanner.ZXing.Cpp/zxing-cpp.js"></script> to your host page.'));
+            }
+            zxingPromise = ZXingCpp();
         }
-        // @TODO: stop decoding here
-    },
-    attachStreamToVideo: async function (stream, videoSource) {
-        videoSource.srcObject = stream;
-        this.videoElement = videoSource;
-        this.stream = stream;
-
-        return videoSource;
-    },
-    decodeFromConstraints: async function (canvas, constraints, videoSource, callbackFn) {
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        const video = await this.attachStreamToVideo(stream, videoSource);
-        initZxing(canvas, constraints, video,  callbackFn);
-        return;
-    }
-};
-
-async function listVideoInputDevices() {
-
-    const devices = await navigator.mediaDevices.enumerateDevices();
-
-    const videoDevices = [];
-
-    for (const device of devices) {
-        const kind = device.kind === 'video' ? 'videoinput' : device.kind;
-
-        if (kind !== 'videoinput') {
-            continue;
-        }
-
-        const deviceId = device.deviceId || device.id;
-        const label = device.label || `Video device ${videoDevices.length + 1}`;
-        const groupId = device.groupId;
-
-        const videoDevice = { deviceId, label, kind, groupId };
-
-        videoDevices.push(videoDevice);
+        return zxingPromise;
     }
 
-    return videoDevices;
-}
-window.BlazorBarcodeScanner = {
-    codeReader: codeReader,
-    listVideoInputDevices: async function () { return await listVideoInputDevices(); },
-    selectedDeviceId: undefined,
-    setSelectedDeviceId: function (deviceId) {
-        this.selectedDeviceId = deviceId;
-    },
-    getSelectedDeviceId: function () {
-        return this.selectedDeviceId;
-    },
-    streamWidth: 640,
-    streamHeight: 480,
-    setVideoResolution: function (width, height) {
-        this.streamWidth = width;
-        this.streamHeight = height;
-    },
-    lastPicture: undefined,
-    lastPictureDecoded: undefined,
-    lastPictureDecodedFormat: undefined,
-    getVideoConstraints: function () {
-        let videoConstraints = {};
-
-        if (!this.selectedDeviceId) {
-            videoConstraints["facingMode"] = 'environment';
-        }
-        else {
-            videoConstraints["deviceId"] = { exact: this.selectedDeviceId };
-        }
-
-        if (this.streamWidth) videoConstraints["width"] = { ideal: this.streamWidth };
-        if (this.streamHeight) videoConstraints["height"] = { ideal: this.streamHeight };
-
-        return videoConstraints;
-    },
-    startDecoding: async function (video) {
-        let videoConstraints = this.getVideoConstraints();
-
-        console.log("Starting decoding with " + videoConstraints);
-        
-        let videoCanvas = document.getElementById("video-canvas");//TODO Expose canvas reference from C# library
-
-        await this.codeReader.decodeFromConstraints(videoCanvas, { video: videoConstraints }, video, (result, err) => {
-            if (result) {
-                if (this.lastPictureDecodedFormat) {
-                    let captureCanvas = document.getElementsById('capture');//TODO Expose canvas reference from C# library
-                    this.lastPictureDecoded = this.capture(this.lastPictureDecodedFormat, captureCanvas);
-                }
-                Helpers.receiveBarcode(result.text)
-                    .then(message => {
-                        console.log(message);
-                    });
-            }
-            if (err && !(err instanceof ZXing.NotFoundException)) {
-                Helpers.receiveError(err)
-                    .then(message => {
-                        console.log(message);
-                    });
-            }
-            if (err && (err instanceof ZXing.NotFoundException)) {
-                this.lastPictureDecoded = undefined;
-                Helpers.receiveNotFound();
-            }
+    function mediaStreamSetTorch(track, onOff) {
+        return track.applyConstraints({
+            advanced: [{
+                fillLightMode: onOff ? 'flash' : 'off',
+                torch: !!onOff,
+            }],
         });
-
-        // Make sure the actual selectedDeviceId is logged after start decoding.
-        //this.selectedDeviceId = this.codeReader.stream.getVideoTracks()[0].getSettings()["deviceId"];
-
-        /*  this.codeReader.stream.getVideoTracks()[0].applyConstraints({
-              advanced: [{ torch: true }] // or false to turn off the torch
-          }); */
-        console.log(`Started continous decode from camera with id ${this.selectedDeviceId}`);
-        Helpers.decodingStarted(this.selectedDeviceId)
-    },
-    stopDecoding: function () {
-        this.codeReader.reset();
-        Helpers.receiveBarcode('')
-            .then(message => {
-                console.log(message);
-            });
-        Helpers.decodingStopped(this.selectedDeviceId)
-        console.log('Reset camera stream.');
-    },
-    setTorchOn: function () {
-        if (mediaStreamIsTorchCompatible(this.codeReader.stream)) {
-            mediaStreamSetTorch(this.codeReader.stream.getVideoTracks()[0], true);
-        }
-    },
-    setTorchOff() {
-        if (mediaStreamIsTorchCompatible(this.codeReader.stream)) {
-            mediaStreamSetTorch(this.codeReader.stream.getVideoTracks()[0], false);
-        }
-    },
-    toggleTorch() {
-        let track = mediaStreamGetTorchCompatibleTrack(this.codeReader.stream);
-        if (track !== null) {
-            let torchStatus = !track.getSettings().torch;
-            mediaStreamSetTorch(track, torchStatus);
-        }
-    },
-    capture: async function (type, canvas) {
-        this.lastPicture = "";
-
-        if (!this.codeReader.stream) {
-            return "";
-        }
-
-        let capture = new ImageCapture(this.codeReader.stream.getVideoTracks()[0]);
-
-        await capture.grabFrame()
-            .then(bitmap => {
-                let context = canvas.getContext('2d');
-
-                canvas.width = bitmap.width;
-                canvas.height = bitmap.height;
-
-                context.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height);
-
-                this.lastPicture = canvas.toDataURL(type);
-            });
-    },
-    pictureGetBase64Unmarshalled: function (source) {
-        let source_str = BINDING.conv_string(source);
-        return BINDING.js_string_to_mono_string(this.pictureGetBase64(source_str));
-    },
-    pictureGetBase64: function (source) {
-        let pic = "";
-        switch (source) {
-            case "capture": {
-                pic = this.lastPicture;
-                break;
-            }
-
-            case "decoded": {
-                pic = this.lastPictureDecoded;
-                break;
-            }
-
-            default: {
-                pic = this.lastPicture;
-                break;
-            }
-        }
-        return pic;
-    },
-    setLastDecodedPictureFormat: function (format) {
-        this.lastPictureDecoded = undefined;
-        this.lastPictureDecodedFormat = format;
     }
-};
+
+    /**
+     * @param track The media stream track that will be checked for compatibility.
+     */
+    function mediaStreamIsTorchCompatibleTrack(track) {
+        try {
+            const capabilities = track.getCapabilities();
+            return 'torch' in capabilities;
+        } catch (err) {
+            // some browsers may not be compatible with ImageCapture
+            // so we are ignoring this for now.
+            console.error(err);
+            console.warn('Your browser may be not fully compatible with WebRTC and/or ImageCapture specs. Torch will not be available.');
+            return false;
+        }
+    }
+
+    /** Returns the first track of the stream that supports the torch, or null. */
+    function mediaStreamGetTorchCompatibleTrack(stream) {
+        if (!stream) {
+            return null;
+        }
+
+        for (const track of stream.getVideoTracks()) {
+            if (mediaStreamIsTorchCompatibleTrack(track)) {
+                return track;
+            }
+        }
+
+        return null;
+    }
+
+    async function listVideoInputDevices() {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+
+        const videoDevices = [];
+
+        for (const device of devices) {
+            const kind = device.kind === 'video' ? 'videoinput' : device.kind;
+
+            if (kind !== 'videoinput') {
+                continue;
+            }
+
+            const deviceId = device.deviceId || device.id;
+            const label = device.label || `Video device ${videoDevices.length + 1}`;
+            const groupId = device.groupId;
+
+            videoDevices.push({ deviceId, label, kind, groupId });
+        }
+
+        return videoDevices;
+    }
+
+    /**
+     * A single scanner instance. One is created per BarcodeReader component and handed
+     * to .NET as an IJSObjectReference, so several scanners can coexist on a page.
+     */
+    class BarcodeReader {
+        constructor(dotNetHelper) {
+            this.dotNetHelper = dotNetHelper;
+
+            this.selectedDeviceId = undefined;
+            this.streamWidth = 640;
+            this.streamHeight = 480;
+
+            /* zxing-cpp decode options: '' means "every supported format". */
+            this.formats = '';
+            this.tryHarder = true;
+            this.scanInterval = 100;
+            this.overlayColor = 'red';
+
+            this.lastPicture = '';
+            this.lastPictureDecoded = undefined;
+            this.lastPictureDecodedFormat = undefined;
+
+            this.zxing = undefined;
+            this.stream = undefined;
+            this.video = undefined;
+            this.overlay = undefined;
+
+            /* Off-screen canvas the frames are read back from. */
+            this.scanCanvas = document.createElement('canvas');
+            this.frameHandle = 0;
+            this.lastScan = 0;
+        }
+
+        setSelectedDeviceId(deviceId) {
+            this.selectedDeviceId = deviceId || undefined;
+        }
+
+        getSelectedDeviceId() {
+            return this.selectedDeviceId || '';
+        }
+
+        setVideoResolution(width, height) {
+            this.streamWidth = width;
+            this.streamHeight = height;
+        }
+
+        setDecodeOptions(formats, tryHarder, scanInterval) {
+            this.formats = formats || '';
+            this.tryHarder = !!tryHarder;
+            this.scanInterval = scanInterval > 0 ? scanInterval : 0;
+        }
+
+        setLastDecodedPictureFormat(format) {
+            this.lastPictureDecoded = undefined;
+            this.lastPictureDecodedFormat = format;
+        }
+
+        getVideoConstraints() {
+            const videoConstraints = {};
+
+            if (!this.selectedDeviceId) {
+                videoConstraints["facingMode"] = 'environment';
+            }
+            else {
+                videoConstraints["deviceId"] = { exact: this.selectedDeviceId };
+            }
+
+            if (this.streamWidth) videoConstraints["width"] = { ideal: this.streamWidth };
+            if (this.streamHeight) videoConstraints["height"] = { ideal: this.streamHeight };
+
+            return videoConstraints;
+        }
+
+        async startDecoding(video, overlay) {
+            /* Never leave a previous stream running - it would keep the camera busy. */
+            this.teardown();
+
+            const zxing = await getZXing();
+            const stream = await navigator.mediaDevices.getUserMedia({ video: this.getVideoConstraints(), audio: false });
+
+            this.zxing = zxing;
+            this.stream = stream;
+            this.video = video;
+            this.overlay = overlay;
+
+            video.srcObject = stream;
+            video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
+            video.muted = true;
+            await video.play();
+
+            /* Report back what we actually got - it may differ from what we asked for. */
+            const settings = stream.getVideoTracks()[0].getSettings();
+            if (settings.deviceId) {
+                this.selectedDeviceId = settings.deviceId;
+            }
+
+            this.lastScan = 0;
+            this.frameHandle = requestAnimationFrame(() => this.scanFrame());
+
+            await this.dotNetHelper.invokeMethodAsync('OnDecodingStarted', this.getSelectedDeviceId());
+        }
+
+        async stopDecoding() {
+            const wasDecoding = this.stream !== undefined;
+            const deviceId = this.getSelectedDeviceId();
+
+            this.teardown();
+
+            if (wasDecoding) {
+                await this.dotNetHelper.invokeMethodAsync('OnDecodingStopped', deviceId);
+            }
+        }
+
+        /** Releases the camera and the render loop without calling back into .NET. */
+        teardown() {
+            if (this.frameHandle) {
+                cancelAnimationFrame(this.frameHandle);
+                this.frameHandle = 0;
+            }
+
+            if (this.stream) {
+                this.stream.getTracks().forEach(track => track.stop());
+                this.stream = undefined;
+            }
+
+            if (this.video) {
+                this.video.pause();
+                this.video.srcObject = null;
+            }
+
+            this.clearOverlay();
+            this.lastPictureDecoded = undefined;
+        }
+
+        scanFrame() {
+            if (!this.stream) {
+                return;
+            }
+
+            this.frameHandle = requestAnimationFrame(() => this.scanFrame());
+
+            const now = performance.now();
+            if (now - this.lastScan < this.scanInterval) {
+                return;
+            }
+            this.lastScan = now;
+
+            const width = this.video.videoWidth;
+            const height = this.video.videoHeight;
+            if (!width || !height) {
+                /* The stream has not delivered its first frame yet. */
+                return;
+            }
+
+            if (this.scanCanvas.width !== width || this.scanCanvas.height !== height) {
+                this.scanCanvas.width = width;
+                this.scanCanvas.height = height;
+            }
+
+            const context = this.scanCanvas.getContext('2d', { willReadFrequently: true });
+            context.drawImage(this.video, 0, 0, width, height);
+
+            let result;
+            try {
+                result = this.readBarcode(context, width, height);
+            } catch (err) {
+                this.report('OnErrorReceived', err && err.message ? err.message : String(err));
+                return;
+            }
+
+            this.clearOverlay();
+
+            if (result && result.format) {
+                if (this.lastPictureDecodedFormat) {
+                    this.lastPictureDecoded = this.scanCanvas.toDataURL(this.lastPictureDecodedFormat);
+                }
+                this.drawResult(result, width, height);
+                this.report('OnBarcodeReceived', result.text);
+            } else if (result && result.error) {
+                this.report('OnErrorReceived', result.error);
+            } else {
+                this.lastPictureDecoded = undefined;
+                this.report('OnNotFoundReceived');
+            }
+        }
+
+        readBarcode(context, width, height) {
+            const zxing = this.zxing;
+            if (!zxing) {
+                return null;
+            }
+
+            const sourceBuffer = context.getImageData(0, 0, width, height).data;
+            const buffer = zxing._malloc(sourceBuffer.byteLength);
+            try {
+                zxing.HEAPU8.set(sourceBuffer, buffer);
+                return zxing.readBarcodeFromPixmap(buffer, width, height, this.tryHarder, this.formats);
+            } finally {
+                zxing._free(buffer);
+            }
+        }
+
+        /**
+         * The overlay canvas uses the intrinsic frame size as its backing store, so the
+         * positions reported by zxing-cpp can be drawn without any scaling maths. CSS
+         * takes care of stretching it over the video element.
+         */
+        drawResult(code, width, height) {
+            if (!this.overlay || !code.position) {
+                return;
+            }
+
+            if (this.overlay.width !== width || this.overlay.height !== height) {
+                this.overlay.width = width;
+                this.overlay.height = height;
+            }
+
+            const context = this.overlay.getContext('2d');
+            const position = code.position;
+
+            context.beginPath();
+            context.lineWidth = Math.max(2, Math.round(width / 200));
+            context.strokeStyle = this.overlayColor;
+            context.moveTo(position.topLeft.x, position.topLeft.y);
+            context.lineTo(position.topRight.x, position.topRight.y);
+            context.lineTo(position.bottomRight.x, position.bottomRight.y);
+            context.lineTo(position.bottomLeft.x, position.bottomLeft.y);
+            context.closePath();
+            context.stroke();
+        }
+
+        clearOverlay() {
+            if (!this.overlay) {
+                return;
+            }
+
+            const context = this.overlay.getContext('2d');
+            if (context) {
+                context.clearRect(0, 0, this.overlay.width, this.overlay.height);
+            }
+        }
+
+        setTorchOn() {
+            return this.setTorch(true);
+        }
+
+        setTorchOff() {
+            return this.setTorch(false);
+        }
+
+        setTorch(onOff) {
+            const track = mediaStreamGetTorchCompatibleTrack(this.stream);
+            return track === null ? Promise.resolve() : mediaStreamSetTorch(track, onOff);
+        }
+
+        toggleTorch() {
+            const track = mediaStreamGetTorchCompatibleTrack(this.stream);
+            return track === null ? Promise.resolve() : mediaStreamSetTorch(track, !track.getSettings().torch);
+        }
+
+        async capture(type) {
+            this.lastPicture = '';
+
+            if (!this.stream || !this.video) {
+                return '';
+            }
+
+            let source = this.video;
+            let width = this.video.videoWidth;
+            let height = this.video.videoHeight;
+
+            /* ImageCapture gives us the full sensor resolution, but Safari and Firefox
+             * do not implement it - fall back to the frame shown in the video element. */
+            if (typeof ImageCapture !== 'undefined') {
+                try {
+                    const bitmap = await new ImageCapture(this.stream.getVideoTracks()[0]).grabFrame();
+                    source = bitmap;
+                    width = bitmap.width;
+                    height = bitmap.height;
+                } catch (err) {
+                    console.warn('ImageCapture failed, capturing the current video frame instead.', err);
+                }
+            }
+
+            if (!width || !height) {
+                return '';
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            canvas.getContext('2d').drawImage(source, 0, 0, width, height);
+
+            this.lastPicture = canvas.toDataURL(type);
+            return this.lastPicture;
+        }
+
+        pictureGetBase64(source) {
+            switch (source) {
+                case "decoded":
+                    return this.lastPictureDecoded || '';
+
+                case "capture":
+                default:
+                    return this.lastPicture || '';
+            }
+        }
+
+        /** Fire and forget - a failing callback must not kill the render loop. */
+        report(method, ...args) {
+            this.dotNetHelper.invokeMethodAsync(method, ...args)
+                .catch(err => console.error(`BlazorBarcodeScanner: ${method} failed`, err));
+        }
+
+        dispose() {
+            this.teardown();
+            this.dotNetHelper = undefined;
+        }
+    }
+
+    window.BlazorBarcodeScannerZXingCpp = {
+        listVideoInputDevices: listVideoInputDevices,
+        createReader: function (dotNetHelper) { return new BarcodeReader(dotNetHelper); },
+    };
+})();

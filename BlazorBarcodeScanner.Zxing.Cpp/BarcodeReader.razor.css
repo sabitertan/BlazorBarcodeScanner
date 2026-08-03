@@ -1,0 +1,31 @@
+/* The overlay canvas has to sit exactly on top of the video for the detection
+   outline drawn by zxing-cpp to line up with what the user sees. */
+.zxing-video-container {
+    position: relative;
+    display: inline-block;
+    line-height: 0;
+}
+
+.zxing-video-container.full-width {
+    display: block;
+    width: 100%;
+}
+
+.zxing-video {
+    display: block;
+    max-width: 100%;
+}
+
+.zxing-video-container.full-width .zxing-video {
+    width: 100%;
+    height: auto;
+}
+
+.zxing-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
