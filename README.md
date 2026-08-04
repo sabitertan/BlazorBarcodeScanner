@@ -9,6 +9,8 @@ Barcode Scanner component for Blazor, available with two interchangeable reader 
 | `BlazorBarcodeScanner.ZXing.JS` | [zxing-js](https://github.com/zxing-js/library) | Pure JavaScript, the original implementation. |
 | `BlazorBarcodeScanner.ZXing.Cpp` | [zxing-cpp](https://github.com/zxing-cpp/zxing-cpp) compiled to WebAssembly | Faster decoding, format filtering, detection overlay. Ships a ~1.3 MB `.wasm` payload. |
 
+The bundled zxing-cpp build is [`v2.1.0-114-g9a1a0879`](https://github.com/zxing-cpp/zxing-cpp/commit/9a1a0879) (18 Nov 2023).
+
 Both expose the same `BarcodeReader` component surface, so switching engines is a matter of
 changing the namespace and the script tags. They can also be referenced side by side in one
 app - the demo does exactly that.
