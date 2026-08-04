@@ -6,7 +6,7 @@
 	</PropertyGroup>
 	<PropertyGroup>
 		<PackageId>BlazorBarcodeScanner.ZXing.Cpp</PackageId>
-		<Version>1.0.0</Version>
+		<Version>1.1.0</Version>
 		<Authors>Sabit Igde, Ueli Niederer</Authors>
 		<Company />
 		<Description>Barcode Scanner component for Blazor using the zxing-cpp WebAssembly reader</Description>
@@ -15,7 +15,7 @@
 		<PackageTags>Blazor Barcode QRCode Reader Scanner ZXing WebAssembly</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageReleaseNotes>First release. Barcode reading through the zxing-cpp WebAssembly module, targeting .NET 8, 9 and 10.</PackageReleaseNotes>
+		<PackageReleaseNotes>Updates the bundled zxing-cpp to v3.1.1 and switches to the reader-only WebAssembly build, cutting 240 KB off the payload.</PackageReleaseNotes>
 		<RepositoryType>git</RepositoryType>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>

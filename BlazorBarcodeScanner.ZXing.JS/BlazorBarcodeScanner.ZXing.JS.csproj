@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 	<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
-    <Version>2.0.0</Version>
+    <Version>2.1.0</Version>
     <Authors>Sabit Igde, Ueli Niederer</Authors>
 	<Company />
 	<Description>Barcode Scanner component for Blazor using zxing-js Interop</Description>
@@ -11,7 +11,7 @@
 	<PackageTags>Blazor Barcode QRCode Reader Scanner ZXing</PackageTags>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
-	<PackageReleaseNotes>Targets .NET 8, 9 and 10. Support for .NET 6 and 7 has been dropped - stay on 1.0.4 for those.</PackageReleaseNotes>
+	<PackageReleaseNotes>Updates the bundled zxing-js to 0.23.0, adding MaxiCode and MicroQR support.</PackageReleaseNotes>
 	<RepositoryType>git</RepositoryType>
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<EmbedUntrackedSources>true</EmbedUntrackedSources>
