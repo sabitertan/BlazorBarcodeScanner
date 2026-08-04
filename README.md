@@ -1,4 +1,5 @@
-![Nuget](https://img.shields.io/nuget/v/BlazorBarcodeScanner.ZXing.JS?style=flat-square)
+[![Nuget ZXing.JS](https://img.shields.io/nuget/v/BlazorBarcodeScanner.ZXing.JS?style=flat-square&label=ZXing.JS)](https://www.nuget.org/packages/BlazorBarcodeScanner.ZXing.JS)
+[![Nuget ZXing.Cpp](https://img.shields.io/nuget/v/BlazorBarcodeScanner.ZXing.Cpp?style=flat-square&label=ZXing.Cpp)](https://www.nuget.org/packages/BlazorBarcodeScanner.ZXing.Cpp)
 ![build](https://github.com/sabitertan/BlazorBarcodeScanner/actions/workflows/main.yml/badge.svg)
 # BlazorBarcodeScanner
 Barcode Scanner component for Blazor, available with two interchangeable reader engines.

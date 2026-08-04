@@ -2,16 +2,26 @@
 
   <PropertyGroup>
 	<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
-    <Version>1.1.0</Version>
+    <Version>2.0.0</Version>
     <Authors>Sabit Igde, Ueli Niederer</Authors>
 	<Company />
 	<Description>Barcode Scanner component for Blazor using zxing-js Interop</Description>
+	<PackageProjectUrl>https://github.com/sabitertan/BlazorBarcodeScanner</PackageProjectUrl>
 	<RepositoryUrl>https://github.com/sabitertan/BlazorBarcodeScanner</RepositoryUrl>
-	<PackageTags>Blazor Barcode QRCode Reader Scanner</PackageTags>
-	<PackageLicenseFile></PackageLicenseFile>
+	<PackageTags>Blazor Barcode QRCode Reader Scanner ZXing</PackageTags>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+	<PackageReleaseNotes>Targets .NET 8, 9 and 10. Support for .NET 6 and 7 has been dropped - stay on 1.0.4 for those.</PackageReleaseNotes>
 	<RepositoryType>git</RepositoryType>
+	<PublishRepositoryUrl>true</PublishRepositoryUrl>
+	<EmbedUntrackedSources>true</EmbedUntrackedSources>
+	<IncludeSymbols>true</IncludeSymbols>
+	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+	<ItemGroup>
+		<None Include="../README.md" Pack="true" PackagePath="\" />
+		<None Include="../LICENSE" Pack="true" PackagePath="\" />
+	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
 		<PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.*" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.*" />
