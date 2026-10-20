@@ -97,7 +97,7 @@ Note that `ShowToggleTorch` is an experimental feature.
 
 ### Receiving callbacks
 #### OnBarcodeReceived
-The library raises a custom event, whenever the barcode scanner sucessfully decoded a value from video stream. You can attach to that event using the component's Blazor `EventCallback` named `OnBarcodeReceived`.
+The library raises a custom event, whenever the barcode scanner successfully decoded a value from video stream. You can attach to that event using the component's Blazor `EventCallback` named `OnBarcodeReceived`.
 
 See the corresponding fragments in the code blocks below:
 
@@ -157,7 +157,7 @@ Therefor the component features an API call to capture such an image as base64 e
 ##### Retrieving the picture for the last code decoded
 In some applications it might be useful to take a still image of the frame that just decoded the last barcode.
 This functionality can be enabled by setting the `DecodedPictureCapture` attribute to `true`. This will cause the component to store last image successfully decoded.
-Upon sucessful deciding (e.g. reception of `OnCodeReceived`), the picture can be accessed by invoking `CaptureLastDecodedPicture`.
+Upon successful deciding (e.g. reception of `OnCodeReceived`), the picture can be accessed by invoking `CaptureLastDecodedPicture`.
 
 **Warning**: Bear in mind that capturing those pictures might impair performance, CPU load or battery life.
 
